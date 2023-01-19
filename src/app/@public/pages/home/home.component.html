@@ -13,26 +13,24 @@
 			<h2>Proximas citas</h2>
 		</div>
 		<div class="row panelControl">
-			<div class="col-3">
-				<div class="row mt-4">
+			<div class="col-7 ml-2">
+				<div class="row mt-2">
 					<input type="checkbox" (change)="ChangeClass($event)" checked />
 					Estilo de los datos mejorado
 				</div>
-				<div class="row mb-4">
+				<div class="row">
 					<input type="checkbox" (change)="ShowColumns($event)" checked />
 					Mostrar columnas
 				</div>
+				<div class="row mt-4">
+					<form>
+						<label>Numero elementos por página: <input type="number" name="input" [(ngModel)]="numeroElementos" min="7" max="100" required /> </label>
+					</form>
+				</div>
 			</div>
-			<div class="col-6 mt-4">
-				<form>
-					
-					<label>Numero elementos por página: <input type="number" name="input" [(ngModel)]="numeroElementos"  min="7" max="100" required /> </label>
 
-				</form>
-					<!-- <button type="button"class="btn btn-primary ml-2" (click)="setNumeroRegistrosXPagina()">Actualizar</button> -->
-			</div>
-			<div class="col-3 mt-4">
-				<button type="button" class="btn btn-primary mt-2 mb-2" (click)="addPersons(5)">Añadir 5 personas</button>
+			<div class="col-4 mt-2">
+				<button type="button" class="btn btn-primary mb-2" (click)="addPersons(5)">Añadir 5 personas</button>
 				<button type="button" class="btn btn-primary mb-2" (click)="addPersons(25000)">Añadir 25.000 personas</button>
 				<button type="button" class="btn btn-primary mb-2" (click)="addPersons(100000)">Añadir 100.000 personas</button>
 			</div>
@@ -41,37 +39,52 @@
 
 		<!-- table table-hover  -->
 		<div class="row">
-			<table class="{{ ChangeTableClass() }}">
-				<thead>
-					<th class="heading">&nbsp;</th>
-					<th class="heading">ID</th>
-					<th class="heading">Nombre</th>
-					<th class="heading">Apellidos</th>
-					<th class="heading">Perfil</th>
+			<div class="col-9">
+				<table class="{{ ChangeTableClass() }}">
+					<thead>
+						<th class="heading">&nbsp;</th>
+						<th class="heading">ID</th>
+						<th class="heading">Nombre</th>
+						<th class="heading">Apellidos</th>
+						<th class="heading">Perfil</th>
 
-					<th class="heading" *ngIf="visionExtendidaColumnas">DNI</th>
-					<th class="heading" *ngIf="visionExtendidaColumnas">Sexo</th>
-					<th class="heading" *ngIf="visionExtendidaColumnas">Fecha de Nacimiento</th>
-					<th class="heading" *ngIf="visionExtendidaColumnas">Fecha de Antiguedad</th>
-				</thead>
-				<tbody *ngFor="let registro of getListadoGeneralFiltrado(); let indice = index">
-					<tr>
-						<td class="heading">{{ indice + 1 }}</td>
+						<th class="heading" *ngIf="visionExtendidaColumnas">DNI</th>
+						<th class="heading" *ngIf="visionExtendidaColumnas">Sexo</th>
+						<th class="heading" *ngIf="visionExtendidaColumnas">Fecha de Nacimiento</th>
+						<th class="heading" *ngIf="visionExtendidaColumnas">Fecha de Antiguedad</th>
+					</thead>
+					<tbody *ngFor="let registro of getListadoGeneralFiltrado(); let indice = index">
+						<tr>
+							<td class="heading">{{ indice + 1 }}</td>
 
-						<td>{{ registro.ID }}</td>
-						<td>{{ registro.nombre }}</td>
-						<td>{{ registro.apellidos }}</td>
-						<td>{{ registro.perfil }}</td>
+							<td>{{ registro.ID }}</td>
+							<td>{{ registro.nombre }}</td>
+							<td>{{ registro.apellidos }}</td>
+							<td>{{ registro.perfil }}</td>
 
-						<td *ngIf="visionExtendidaColumnas">{{ registro.DNI }}</td>
-						<td *ngIf="visionExtendidaColumnas">{{ registro.sexo }}</td>
-						<td *ngIf="visionExtendidaColumnas">{{ registro.fecha_nacimiento | date : "dd MMMM yyyy" }}</td>
-						<td *ngIf="visionExtendidaColumnas">{{ registro.fecha_antiguedad | date : "dd MMMM yyyy" }}</td>
+							<td *ngIf="visionExtendidaColumnas">{{ registro.DNI }}</td>
+							<td *ngIf="visionExtendidaColumnas">{{ registro.sexo }}</td>
+							<td *ngIf="visionExtendidaColumnas">{{ registro.fecha_nacimiento | date : "dd MMMM yyyy" }}</td>
+							<td *ngIf="visionExtendidaColumnas">{{ registro.fecha_antiguedad | date : "dd MMMM yyyy" }}</td>
 
-						<!-- <td><i class="{{ getIcono(registro.estado) }} fa-2x mr-2" title="{{ registro.estado }}"></i></td> -->
-					</tr>
-				</tbody>
-			</table>
+							<!-- <td><i class="{{ getIcono(registro.estado) }} fa-2x mr-2" title="{{ registro.estado }}"></i></td> -->
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="col-3">
+				<div class="container panelControl	">
+
+					<div class="row ml-2 mt-2">Pág. actual: {{ getPaginaActual() + 1 }}</div>
+					<div class="row ml-2">Elementos por pág.: {{ getElementoXPagina() }}</div>
+					<div class="row ml-2 mb-2">Últ. pág.: {{ getPaginaMaxima() + 1 }}</div>
+				</div>
+
+				<div class="row">
+					Información de persona
+				</div>
+			</div>
+
 		</div>
 		<div class="row">
 			<div class="col-6 mt-4">
@@ -83,11 +96,3 @@
 		</div>
 	</div>
 </div>
-<br />
-pagina actual: {{ getPaginaActual() }}
-<br />
-elementos por página: {{ getElementoXPagina() }}
-<br />
-paginaMaxima: {{ getPaginaMaxima() }}
-
-

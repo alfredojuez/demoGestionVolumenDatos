@@ -27,7 +27,7 @@ export class HomeComponent implements OnInit {
 	listadoGeneral = [];
 
 	ngOnInit(): void {
-		console.log(this.listadoGeneral);
+		this.addPersons(25);
 	}
 
 	/**
@@ -119,7 +119,7 @@ export class HomeComponent implements OnInit {
 	 */
 	paginaActual = 0;
 	numeroElementos = 7;
-	paginaMaxima = 0;
+	paginaMaxima = 1;
 
 	getPaginaActual() {
 		return this.paginaActual; 
@@ -130,14 +130,8 @@ export class HomeComponent implements OnInit {
     return this.numeroElementos;
   }
 
-  validaClick(value)
-  {
-    console.log("xxxxxxxxxxxx")
-    console.log(value)
-  }
-
 	getPaginaMaxima() {
-    this.paginaMaxima = Math.floor(this.listadoGeneral.length / this.numeroElementos);
+    this.paginaMaxima = Math.floor(this.listadoGeneral.length / this.numeroElementos) ;
 		return this.paginaMaxima;
 	}
 
@@ -173,7 +167,7 @@ export class HomeComponent implements OnInit {
 	}
 
 	getRandomDNI(): string {
-		return "TRWAGMYFPDXBNJZSQVHLCKE"[Math.floor(Math.random() * 99999999) % 23];
+		return (Math.floor(Math.random() * 99999999)).toString() + "TRWAGMYFPDXBNJZSQVHLCKE"[Math.floor(Math.random() * 99999999) % 23] ;
 	}
 	getRandInt(max: number) {
 		return Math.floor(Math.random() * max) + 1;
