@@ -1,0 +1,54 @@
+<div class="container">
+  <div class="titulo-general">
+    <i class="fa fa-fire-extinguisher mr-2"></i>
+      Bomberos de la Junta de Extremadura
+  </div>
+
+  <nav class="navbar navbar-expand-lg subtitulo-general">
+    <ul class="navbar-nav mr-auto">
+      <li>
+        <a [routerLink]="['/home']" routerLinkActive="activo"
+          ><i class="fa fa-home mr-2"></i>home</a
+        >
+      </li>
+      <!-- <li *ngIf="soyAdmin()">
+        <a [routerLink]="['/admin']" routerLinkActive="activo"><i class="fa fa-admin mr-2"></i>admin</a>
+      </li> -->
+      <li *ngIf="soyAdmin()">
+        <a [routerLink]="['/admin/params']" routerLinkActive="activo"
+          ><i class="fa fa-gears mr-2"></i>params</a
+        >
+      </li>
+      <li *ngIf="soyAdmin()">
+        <a [routerLink]="['/admin/dashboard']" routerLinkActive="activo"
+          ><i class="fa fa-chart-users mr-2"></i>Dashboard</a
+        >
+      </li>
+      <li>
+        <a [routerLink]="['/contact']" routerLinkActive="activo"
+          ><i class="fa fa-envelope mr-2"></i>contact</a
+        >
+      </li>
+      <li>
+        <a [routerLink]="['/about']" routerLinkActive="activo"
+          ><i class="fa fa-info mr-2"></i>about</a
+        >
+      </li>
+      <!-- <li *ngIf="estoyLogado()">
+        <a [routerLink]="['/public']" routerLinkActive="activo"><i class="fa fa-public mr-2"></i>public</a>
+      </li> -->
+      <li *ngIf="estoyLogado()">
+        <a [routerLink]="['/public/user']" routerLinkActive="activo"
+          ><i class="fa fa-user mr-2"></i>user</a
+        >
+      </li>
+    </ul>
+
+    <div class="form-inline mr-4">
+      <input class="form-control mr-sm-2" [(ngModel)]="filtro" type="search" placeholder="¿Qué estás buscando?" aria-label="Search">
+      <button class="btn btn-outline-warning my-2 my-sm-0" (click)="filtraDatos()"><i class="fa fa-search mr-2"></i>Buscar</button>
+      
+    </div>
+  </nav>
+  <router-outlet></router-outlet>
+</div>

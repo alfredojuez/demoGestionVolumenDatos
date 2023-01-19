@@ -1,0 +1,93 @@
+<div class="container mb-5" *ngIf="!estoyLogado()">
+	<div class="row mb-5">
+		<button type="button" class="btn btn-primary mr-2 col-2 mt-4" (click)="comprobarLogin()"><i class="fa fa-user mr-2"></i>Login</button>
+		<button type="button" class="btn btn-primary col-2 mt-4" (click)="comprobarLoginAdmin()"><i class="fa fa-user-shield mr-2"></i>Login as admin</button>
+	</div>
+</div>
+
+<div class="container" *ngIf="estoyLogado()">
+	<!-- Opcion de cambios de estilos dinamicos -->
+
+	<div class="container">
+		<div class="row">
+			<h2>Proximas citas</h2>
+		</div>
+		<div class="row panelControl">
+			<div class="col-3">
+				<div class="row mt-4">
+					<input type="checkbox" (change)="ChangeClass($event)" checked />
+					Estilo de los datos mejorado
+				</div>
+				<div class="row mb-4">
+					<input type="checkbox" (change)="ShowColumns($event)" checked />
+					Mostrar columnas
+				</div>
+			</div>
+			<div class="col-6 mt-4">
+				<form>
+					
+					<label>Numero elementos por página: <input type="number" name="input" [(ngModel)]="numeroElementos"  min="7" max="100" required /> </label>
+
+				</form>
+					<!-- <button type="button"class="btn btn-primary ml-2" (click)="setNumeroRegistrosXPagina()">Actualizar</button> -->
+			</div>
+			<div class="col-3 mt-4">
+				<button type="button" class="btn btn-primary mt-2 mb-2" (click)="addPersons(5)">Añadir 5 personas</button>
+				<button type="button" class="btn btn-primary mb-2" (click)="addPersons(25000)">Añadir 25.000 personas</button>
+				<button type="button" class="btn btn-primary mb-2" (click)="addPersons(100000)">Añadir 100.000 personas</button>
+			</div>
+		</div>
+		<div class="row">El listado actual tiene {{ listadoGeneral.length }} registros</div>
+
+		<!-- table table-hover  -->
+		<div class="row">
+			<table class="{{ ChangeTableClass() }}">
+				<thead>
+					<th class="heading">&nbsp;</th>
+					<th class="heading">ID</th>
+					<th class="heading">Nombre</th>
+					<th class="heading">Apellidos</th>
+					<th class="heading">Perfil</th>
+
+					<th class="heading" *ngIf="visionExtendidaColumnas">DNI</th>
+					<th class="heading" *ngIf="visionExtendidaColumnas">Sexo</th>
+					<th class="heading" *ngIf="visionExtendidaColumnas">Fecha de Nacimiento</th>
+					<th class="heading" *ngIf="visionExtendidaColumnas">Fecha de Antiguedad</th>
+				</thead>
+				<tbody *ngFor="let registro of getListadoGeneralFiltrado(); let indice = index">
+					<tr>
+						<td class="heading">{{ indice + 1 }}</td>
+
+						<td>{{ registro.ID }}</td>
+						<td>{{ registro.nombre }}</td>
+						<td>{{ registro.apellidos }}</td>
+						<td>{{ registro.perfil }}</td>
+
+						<td *ngIf="visionExtendidaColumnas">{{ registro.DNI }}</td>
+						<td *ngIf="visionExtendidaColumnas">{{ registro.sexo }}</td>
+						<td *ngIf="visionExtendidaColumnas">{{ registro.fecha_nacimiento | date : "dd MMMM yyyy" }}</td>
+						<td *ngIf="visionExtendidaColumnas">{{ registro.fecha_antiguedad | date : "dd MMMM yyyy" }}</td>
+
+						<!-- <td><i class="{{ getIcono(registro.estado) }} fa-2x mr-2" title="{{ registro.estado }}"></i></td> -->
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<div class="row">
+			<div class="col-6 mt-4">
+				<button type="button" [disabled]="disable_boton_atras" class="btn btn-primary" (click)="irAPagina(paginaActual - 1)">Atras</button>
+			</div>
+			<div class="col-6 mt-4">
+				<button type="button" [disabled]="disable_boton_siguiente" class="btn btn-primary" (click)="irAPagina(paginaActual + 1)">Siguiente</button>
+			</div>
+		</div>
+	</div>
+</div>
+<br />
+pagina actual: {{ getPaginaActual() }}
+<br />
+elementos por página: {{ getElementoXPagina() }}
+<br />
+paginaMaxima: {{ getPaginaMaxima() }}
+
+

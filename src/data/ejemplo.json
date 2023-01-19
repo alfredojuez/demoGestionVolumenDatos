@@ -1,0 +1,38 @@
+[
+  {
+    "cita": "2021-01-09T14:00:57",
+    "motivo": "Consulta prueba esfuerzo",
+    "especialidad": "cardiología",
+    "hospital": "Hospital Universitario de la Princesa",
+    "ubicacion": "Calle de la Princesa, 58, 28008 Madrid",
+    "notas": "Llevar historial médico y medicación actual",
+    "estado": "POSTPUESTO"
+  },
+  {
+    "cita": "2021-01-20T13:00:57",
+    "motivo": "Consulta de rutina",
+    "especialidad": "cardiología",
+    "hospital": "Hospital Universitario de la Princesa",
+    "ubicacion": "Calle de la Princesa, 58, 28008 Madrid",
+    "notas": "Llevar historial médico y medicación actual",
+    "estado": "REALIZADA"
+  },
+  {
+    "cita": "2021-12-30T09:00:57",
+    "motivo": "Consulta de rutina",
+    "especialidad": "cardiología",
+    "hospital": "Hospital Universitario de la Princesa",
+    "ubicacion": "Calle de la Princesa, 58, 28008 Madrid",
+    "notas": "Llevar historial médico y medicación actual",
+    "estado": "CANCELADA"
+  },
+  {
+    "cita": "2022-12-26T11:00:57",
+    "motivo": "Consulta de rutina",
+    "especialidad": "cardiología",
+    "hospital": "Hospital Universitario de la Princesa",
+    "ubicacion": "Calle de la Princesa, 58, 28008 Madrid",
+    "notas": "Llevar historial médico y medicación actual",
+    "estado": "PENDIENTE"
+  }
+]
