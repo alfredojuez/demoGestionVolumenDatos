@@ -166,7 +166,7 @@ export class HomeComponent implements OnInit {
 
 	getRandPerfil(): number {
 		//La mayoría tienen que ser 1 u 2
-		const probabilidades = [70, 20, 8git s, 2];
+		const probabilidades = [70, 20, 8, 2]; 
 		const elegido = Math.random() * 100;
 		let acumulado = 0;
 		for (let i = 0; i < probabilidades.length; i++) {
