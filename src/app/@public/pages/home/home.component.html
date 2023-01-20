@@ -73,7 +73,7 @@
 								</td>
 								<td>{{ registro.nombre }}</td>
 								<td>{{ registro.apellidos }}</td>
-								<td>{{  getLiteralPerfil(registro.perfil)  }}</td>
+								<td>{{ getLiteralPerfil(registro.perfil) }}</td>
 
 								<td *ngIf="visionExtendidaColumnas">{{ registro.DNI }}</td>
 								<td *ngIf="visionExtendidaColumnas">{{ registro.sexo }}</td>
@@ -84,18 +84,25 @@
 							</tr>
 						</tbody>
 					</table>
+
+					<div class="row">
+						<div class="ml-3 mt-2 col-6">
+							<div class="row infoTabla">
+								<div class="col-12 ml-2 mt-2">Pág. actual: {{ getPaginaActual() + 1 }}</div>
+								<div class="col-12 ml-2">Elementos por pág.: {{ getElementoXPagina() }}</div>
+								<div class="col-12 ml-2 mb-2">Últ. pág.: {{ getPaginaMaxima() + 1 }}</div>
+							</div>
+						</div>
+						<div class="mt-4 col-4">
+							<button type="button" [disabled]="disable_boton_atras" class="btn btn-primary ml-4" (click)="irAPagina(paginaActual - 1)">Atras</button>
+							<button type="button" [disabled]="disable_boton_siguiente" class="btn btn-primary ml-2" (click)="irAPagina(paginaActual + 1)">Siguiente</button>
+						</div>
+					</div>
 				</div>
 				<div class="col-4">
-					<div class="container ">
-						<div class="row panelCabeceraResumen">
-							<div class="col-12 ml-2 mt-2">Pág. actual: {{ getPaginaActual() + 1 }}</div>
-							<div class="col-12 ml-2">Elementos por pág.: {{ getElementoXPagina() }}</div>
-							<div class="col-12 ml-2 mb-2">Últ. pág.: {{ getPaginaMaxima() + 1 }}</div>
-						</div>
-
+					<div class="container">
 						<div class="row resumenInfo personControl mb-4" *ngIf="personaSeleccionada">
-							<h5 class="col-12 mt-3">Información personal</h5>
-
+							<h5 class="col-10 mt-3">Información personal</h5> <h5 class="col-1 mt-3" (click)="cierraInfoPersona()">X</h5>
 							<div class="col-12"><b>Nombre</b>: {{ personaSeleccionada.nombre }}</div>
 							<div class="col-12"><b>Apellidos</b>: {{ personaSeleccionada.apellidos }}</div>
 							<div class="col-12"><b>ID</b>: {{ personaSeleccionada.ID }}</div>
@@ -109,13 +116,11 @@
 							<div class="col-12"><b>Nº</b>: {{ personaSeleccionada.numero }}</div>
 							<div class="col-12 mb-2"><b>Piso</b>: {{ personaSeleccionada.piso }}</div>
 						</div>
+
+						<div class="row resumenInfo personControl mb-4" *ngIf="!personaSeleccionada">
+							<h5 class="col-12 mt-3">Seleccione una persona para ver su información detallada</h5>
+						</div>
 					</div>
-				</div>
-			</div>
-			<div class="row">
-				<div class="mt-4">
-					<button type="button" [disabled]="disable_boton_atras" class="btn btn-primary ml-4" (click)="irAPagina(paginaActual - 1)">Atras</button>
-					<button type="button" [disabled]="disable_boton_siguiente" class="btn btn-primary ml-2" (click)="irAPagina(paginaActual + 1)">Siguiente</button>
 				</div>
 			</div>
 		</div>
@@ -128,44 +133,70 @@
 	</div>
 
 	<div class="row panelControl mb-4">
-		<div class="col-2 mt-2 ml-2">
+		<div class="col-12 mt-1 ml-1">
 			<h5>Requisitos:</h5>
 		</div>
-		<div class="col-12 ml-4">
-			<div class="row">Hay tres turnos con un número mínimo de personas por turno</div>
 
-			<form name="turnos" class="row">
-				<div class="enLinea">
-					<input type="number" name="Mañana" [(ngModel)]="personasMinimasXTurnos.M" min="1" max="100" required />
+		<div class="ml-1 cuadranteLight w300">
+			<div class="row espaciado-lateral mt-2">Hay tres turnos con un número mínimo de personas por turno</div>
+
+			<form name="row espaciado-lateral">
+				<div class="enLinea espaciado-lateral mt-3">
+					<input class="w70" type="number" name="Mañana" [(ngModel)]="personasMinimasXTurnos.M" min="1" max="100" required />
 					<div class="">[M]añana</div>
 				</div>
-				<div class="enLinea">
-					<input type="number" name="Tarde" [(ngModel)]="personasMinimasXTurnos.T" min="1" max="100" required />
+				<div class="enLinea mr-3">
+					<input class="w70" type="number" name="Tarde" [(ngModel)]="personasMinimasXTurnos.T" min="1" max="100" required />
 					<div class="">[T]arde</div>
 				</div>
-				<div class="enLinea">
-					<input type="number" name="Noche" [(ngModel)]="personasMinimasXTurnos.N" min="1" max="100" required />
+				<div class="enLinea mb-3">
+					<input class="w70" type="number" name="Noche" [(ngModel)]="personasMinimasXTurnos.N" min="1" max="100" required />
 					<div class="">[N]oche</div>
 				</div>
 			</form>
-
-			<div class="row mt-4">
-				<select [(ngModel)]="selectedMonth">
+		</div>
+		<div class="ml-1 cuadranteLight w300">
+			<label class="espaciado-lateral mt-2">El cuadrante se creará para la fecha....</label>
+			<div class="row espaciado-lateral mt-2">
+				<select [(ngModel)]="selectedMonth" class="w100">
 					<option *ngFor="let month of months" [value]="month.id">{{ month.name }}</option>
 				</select>
-				<div class="ml-1 mr-1">del</div>
-				<input type="number" name="anio" [(ngModel)]="selectedYear" min="2022" max="2050" required />
+				<div class="ml-1 mr-1">de</div>
+				<input class="w70" type="number" name="anio" [(ngModel)]="selectedYear" min="2022" max="2050" required />
 			</div>
 		</div>
+
+		<div class="ml-1 cuadranteLight w400">
+			<label class="espaciado-lateral mt-2">Se repetira un turno cada: </label>
+
+			<table class="espaciado-lateral">
+				<tr *ngFor="let item of delays">
+					<td class="w100">{{ getLiteralPerfil(item.perfil) }}</td>
+					<td>
+						<input class="w50" type="number" name="`trabajo${item.perfil}`" [(ngModel)]="item.dias" min="1" max="30" required />
+						<div class="">dias de trabajo</div>
+					</td>
+					<td>
+						<input class="w50" type="number" name="`descanso${item.perfil}`" [(ngModel)]="item.descansos" min="1" max="30" required />
+						<div class="">dias de descanso</div>
+					</td>
+				</tr>
+			</table>
+		</div>
+
 		<div class="col-12 mt-4 mb-4">
 			<button type="button" [disabled]="!cuadranteActual" class="btn btn-warning">Limpiar cuadrantes</button>
 			<button type="button" class="btn btn-warning ml-2" (click)="crearCuadranteMes()">Crear cuadrante mes</button>
 		</div>
+	</div>
 
+	<div class="row resumenInfo personControl mb-4">
 		<div class="col-12 ml-4" *ngIf="cuadranteMes">
-			<h4>Cuadrante del mes de {{getLiteralMonth(selectedMonth)}} de {{selectedYear}}</h4>
+			<h4>Cuadrante del mes de {{ getLiteralMonth(selectedMonth) }} de {{ selectedYear }}</h4>
 		</div>
-		
+
+		<!-- CUADRANTE -->
+
 		<div class="col-12" *ngIf="cuadranteMes">
 			<table class="col-12 ml-4 mb-4">
 				<thead>
@@ -186,5 +217,7 @@
 				</tbody>
 			</table>
 		</div>
+
+		<!-- FIN CUADRANTE -->
 	</div>
 </div>

@@ -166,7 +166,7 @@ export class HomeComponent implements OnInit {
 
 	getRandPerfil(): number {
 		//La mayoría tienen que ser 1 u 2
-		const probabilidades = [70, 20, 8, 2]; 
+		const probabilidades = [40, 35, 12, 8]; //el quinto perfil es lo que queda para el 100%
 		const elegido = Math.random() * 100;
 		let acumulado = 0;
 		for (let i = 0; i < probabilidades.length; i++) {
@@ -249,6 +249,11 @@ export class HomeComponent implements OnInit {
 
 			this.listadoGeneral.push(temp);
 		}
+	}
+
+	cierraInfoPersona()
+	{
+		this.personaSeleccionada=null;
 	}
 
 	estado = true;
@@ -795,6 +800,40 @@ export class HomeComponent implements OnInit {
 
 	cuadranteMes = null;
 
+
+	delays: any[] = [
+		{ perfil: 1, dias:4, descansos: 3 },
+		{ perfil: 2, dias:4, descansos: 3 },
+		{ perfil: 3, dias:2, descansos: 2 },
+		{ perfil: 4, dias:7, descansos: 7 },
+		{ perfil: 5, dias:10, descansos: 10 },
+	];
+
+	setDelay(perfil:number, dias:number, descansos:number)
+	{
+		this.delays.forEach(element => {
+			if(element.perfil === perfil)
+			{
+				element.dias = dias;
+				element.descansos = descansos;
+			}
+		});
+	}
+
+	getDelay(perfil)
+	{
+		let respuesta = null;
+
+		this.delays.forEach(element => {
+			if(element.perfil === perfil)
+			{
+			respuesta = element;
+			}
+		});
+
+		return respuesta;
+	}
+	
 	crearCuadranteMes() {
 		console.log(`Solicitado cuadrante del mes ${this.selectedMonth} de ${this.selectedYear}`);
 		this.cuadranteMes = this.generarListadoDiasXMes(this.selectedMonth, this.selectedYear);
