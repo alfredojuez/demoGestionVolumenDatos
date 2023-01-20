@@ -2,12 +2,38 @@
 @import url("../../../general_styles/colors.scss");
 
 
-
-.panelControl {
-  background-color: var(--amarillo5);
+.personControl {
+  background-color: beige;
 }
 
+.panelControl {
+  background-color: var(--verde1);
 
+  font-size: 16px;
+  color: var(--amarillo5);
+  padding: 1px;
+  border: 1px solid var(--verde1);
+  border-radius: 10px 10px 10px 10px;
+}
+
+.panelCabeceraResumen {
+  background-color: var(--verde1);
+  font-size: 16px;
+  color: var(--amarillo5);
+  padding: 1px;
+  border: 1px solid var(--verde1);
+  border-radius: 10px 10px 10px 10px;
+}
+
+.resumenInfo
+{
+  font-size: 12px;
+}
+.botonControl
+{
+  color: var(--amarillo3);
+  
+}
 
 
 .fa-clock:before {
@@ -26,6 +52,9 @@
   color: var(--azul3);
 }
 
+.enLinea{
+  display: inline-block !important;
+}
 
 .btn_formato {
   margin: 12px 6px 2px 0;

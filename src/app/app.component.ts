@@ -14,19 +14,13 @@ export class AppComponent implements OnInit {
 
   constructor(
     private servicioLogin: UserinfoService,
-    private router: Router,
-    private aroute: ActivatedRoute
+    private router: Router
   ) {}
 
   ngOnInit() {
-    console.log('parametros');
-    //console.log(this.route)
-    // let urlTree = this.router.parseUrl(this.router.url);;
 
     let urlTree = this.router.parseUrl(this.router.url);
     let busqueda = urlTree.queryParams['search'];
-
-    console.log(busqueda);
   }
 
   estoyLogado() {

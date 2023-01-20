@@ -7,5 +7,8 @@ interface Persona {
 	DNI: string; // alfanumerico
 	sexo: "M" | "F";
 	fecha_nacimiento: string; // teniendo en cuenta que tenía que tener entre 18 y 50 años en la fecha_antiguedad
+	calle:string;
+	numero: string;
+	piso: string;
 }
 	
