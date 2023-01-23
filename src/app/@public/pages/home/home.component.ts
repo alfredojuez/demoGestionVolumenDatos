@@ -800,6 +800,11 @@ export class HomeComponent implements OnInit {
 		this.cuadranteMes = this.generarListadoDiasXMes(this.selectedMonth, this.selectedYear);
 	}
 
+	rellenarCuadranteMes()
+	{
+		console.log("Solicitado rellenado de cuadrante")
+	}
+
 	listadoFechas = null;
 
 	generarListadoDiasXMes(mes: number, anio: number): Array<{ dia: number; diaSemana: string; personas: string[] }> {
