@@ -169,16 +169,16 @@
 		<div class="ml-1 cuadranteLight w400">
 			<label class="espaciado-lateral mt-2">Se repetira un turno cada: </label>
 
-			<table class="espaciado-lateral">
+			<table class="espaciado-lateral mb-2 col-12" >
 				<tr *ngFor="let item of delays">
 					<td class="w100">{{ getLiteralPerfil(item.perfil) }}</td>
 					<td>
+						<div class="">Días de trab.</div>
 						<input class="w50" type="number" name="`trabajo${item.perfil}`" [(ngModel)]="item.dias" min="1" max="30" required />
-						<div class="">dias de trabajo</div>
 					</td>
 					<td>
+						<div class="">Días de desc.</div>
 						<input class="w50" type="number" name="`descanso${item.perfil}`" [(ngModel)]="item.descansos" min="1" max="30" required />
-						<div class="">dias de descanso</div>
 					</td>
 				</tr>
 			</table>
@@ -206,14 +206,14 @@
 					<th class="heading col-1"></th>
 					<th class="heading">Tecnicos</th>
 				</thead>
-				<tbody *ngFor="let item of cuadranteMes; let indice = index">
+				<tbody *ngFor="let item of cuadranteMes.dias; let indice = index">
 					<tr>
 						<!-- <td class="heading">{{ indice + 1 }}</td> -->
 						<td>
 							{{ item.diaSemana }}
 						</td>
-						<td>{{ item.dia }}</td>
-						<td>{{ item.personas }}</td>
+						<td>{{ item.numero }}</td>
+						<td>{{ item.perfiles }}</td>
 					</tr>
 				</tbody>
 			</table>

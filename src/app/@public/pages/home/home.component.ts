@@ -2,7 +2,7 @@ import { estadosService } from "./../../services/estados.service";
 import { Component, OnInit } from "@angular/core";
 import { Router } from "@angular/router";
 import { UserinfoService } from "../../services/userinfo.service";
-import { removeSummaryDuplicates } from "@angular/compiler";
+import { Time } from '@angular/common';
 
 interface Persona {
 	nombre: string;
@@ -18,13 +18,38 @@ interface Persona {
 	piso: string;
 }
 
+interface Turno {
+	cod: String;
+	horas: number;
+	hora_ini: Time;
+	hora_fin: Time;
+	personas: Persona[];
+}
+
+interface Perfil {
+	cod: string;
+	nombre: string;
+	turnos: Turno[];
+}
+
+interface Dia {
+	numero: Number;
+	diaSemana: string
+	perfiles: Perfil[];
+}
+
+interface Mes {
+	numeroMes: Number;
+	dias: Dia[];
+}
+
 @Component({
 	selector: "app-home",
 	templateUrl: "./home.component.html",
 	styleUrls: ["./home.component.scss"],
 })
 export class HomeComponent implements OnInit {
-	constructor(private userService: UserinfoService, private router: Router, public estados: estadosService) {}
+	constructor(private userService: UserinfoService, private router: Router, public estados: estadosService) { }
 
 	//ESTO podría ir en un JSON
 	listadoGeneral = [];
@@ -179,7 +204,6 @@ export class HomeComponent implements OnInit {
 	}
 
 	getLiteralPerfil(numero) {
-		console.log(`Solicitado perfil ${numero}`);
 		let respuesta = "";
 		this.perfiles.forEach((element) => {
 			if (element.id === numero) {
@@ -187,7 +211,6 @@ export class HomeComponent implements OnInit {
 			}
 		});
 
-		console.log(`Encontrado perfil ${respuesta}`);
 		return respuesta;
 	}
 
@@ -251,9 +274,8 @@ export class HomeComponent implements OnInit {
 		}
 	}
 
-	cierraInfoPersona()
-	{
-		this.personaSeleccionada=null;
+	cierraInfoPersona() {
+		this.personaSeleccionada = null;
 	}
 
 	estado = true;
@@ -781,7 +803,6 @@ export class HomeComponent implements OnInit {
 	];
 
 	getLiteralMonth(numero) {
-		console.log(`Solicitado perfil ${numero}`);
 		let respuesta = "";
 		this.months.forEach((element) => {
 			if (element.id === numero) {
@@ -789,75 +810,69 @@ export class HomeComponent implements OnInit {
 			}
 		});
 
-		console.log(`mes ${respuesta}`);
 		return respuesta;
 	}
 
 	selectedMonth = 1;
 	selectedYear = 2023;
 
-	cuadranteMes = null;
+	cuadranteMes: Mes = null;
 
 
 	delays: any[] = [
-		{ perfil: 1, dias:4, descansos: 3 },
-		{ perfil: 2, dias:4, descansos: 3 },
-		{ perfil: 3, dias:2, descansos: 2 },
-		{ perfil: 4, dias:7, descansos: 7 },
-		{ perfil: 5, dias:10, descansos: 10 },
+		{ perfil: 1, dias: 4, descansos: 3 },
+		{ perfil: 2, dias: 4, descansos: 3 },
+		{ perfil: 3, dias: 2, descansos: 2 },
+		{ perfil: 4, dias: 7, descansos: 7 },
+		{ perfil: 5, dias: 10, descansos: 10 },
 	];
 
-	setDelay(perfil:number, dias:number, descansos:number)
-	{
+	setDelay(perfil: number, dias: number, descansos: number) {
 		this.delays.forEach(element => {
-			if(element.perfil === perfil)
-			{
+			if (element.perfil === perfil) {
 				element.dias = dias;
 				element.descansos = descansos;
 			}
 		});
 	}
 
-	getDelay(perfil)
-	{
+	getDelay(perfil) {
 		let respuesta = null;
 
 		this.delays.forEach(element => {
-			if(element.perfil === perfil)
-			{
-			respuesta = element;
+			if (element.perfil === perfil) {
+				respuesta = element;
 			}
 		});
 
 		return respuesta;
 	}
-	
+
 	crearCuadranteMes() {
 		console.log(`Solicitado cuadrante del mes ${this.selectedMonth} de ${this.selectedYear}`);
-		this.cuadranteMes = this.generarListadoDiasXMes(this.selectedMonth, this.selectedYear);
+		this.cuadranteMes = {
+			numeroMes: this.selectedMonth,
+			dias: this.generarListadoDiasXMes(this.selectedMonth, this.selectedYear)
+		};
 	}
 
-	rellenarCuadranteMes()
-	{
+	rellenarCuadranteMes() {
 		console.log("Solicitado rellenado de cuadrante")
 	}
 
 	listadoFechas = null;
 
-	generarListadoDiasXMes(mes: number, anio: number): Array<{ dia: number; diaSemana: string; personas: string[] }> {
+	generarListadoDiasXMes(mes: number, anio: number): Array<Dia> {
 		const fecha = new Date(anio, mes - 1);
 		const ultimoDia = new Date(anio, mes, 0).getDate();
-		const dias = [];
-		for (let dia = 1; dia <= ultimoDia; dia++) {
-			fecha.setDate(dia);
+		const dias: Array<Dia> = [];
+		for (let numero = 1; numero <= ultimoDia; numero++) {
+			fecha.setDate(numero);
 			const diaSemana = fecha.toLocaleString("default", { weekday: "long" });
-			dias.push({ dia, diaSemana, personas: [] }); // es lo mismo que (dia:dia, diaSemana:diaSemana , personas:[])
+			let tmp: Dia = { numero, diaSemana, perfiles: [] };
+			dias.push(tmp); // es lo mismo que (dia:dia, diaSemana:diaSemana , personas:[])
 		}
 		return dias;
 	}
-
-
-
-
 
 }
