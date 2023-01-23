@@ -2,7 +2,6 @@ import { estadosService } from "./../../services/estados.service";
 import { Component, OnInit } from "@angular/core";
 import { Router } from "@angular/router";
 import { UserinfoService } from "../../services/userinfo.service";
-import { Time } from '@angular/common';
 
 interface Persona {
 	nombre: string;
@@ -857,12 +856,21 @@ export class HomeComponent implements OnInit {
 		};
 	}
 
+
+	porcentaje = 0;
 	/**
 	 * Para cada persona vamos a decirle que genere su cuadrante.
 	 */
 	rellenarCuadranteMes() {
+		this.porcentaje = 0;
+		let pos = 0;
+		let max = this.listadoGeneral.length;
+
 		console.log("Solicitado rellenado de cuadrante")
 		this.listadoGeneral.forEach(persona => {
+			pos++;
+			this.porcentaje = Math.floor(pos * 100 / max);
+
 			this.generarCuadrantePersona(persona);
 		});
 	}
@@ -927,7 +935,7 @@ export class HomeComponent implements OnInit {
 					hora_ini: "08:00",
 					hora_fin: "15:00",
 					horas: 7,
-					personas_minimas: 15,
+					personas_minimas: 5,
 					personas: []
 				},
 				{
@@ -935,7 +943,7 @@ export class HomeComponent implements OnInit {
 					hora_ini: "15:00",
 					hora_fin: "22:00",
 					horas: 7,
-					personas_minimas: 15,
+					personas_minimas: 5,
 					personas: []
 				},
 				{
@@ -943,7 +951,7 @@ export class HomeComponent implements OnInit {
 					hora_ini: "22:00",
 					hora_fin: "08:00",
 					horas: 10,
-					personas_minimas: 15,
+					personas_minimas: 6,
 					personas: []
 				}
 			]
@@ -957,7 +965,7 @@ export class HomeComponent implements OnInit {
 					hora_ini: "08:00",
 					hora_fin: "15:00",
 					horas: 7,
-					personas_minimas: 9,
+					personas_minimas: 3,
 					personas: []
 				},
 				{
@@ -965,7 +973,7 @@ export class HomeComponent implements OnInit {
 					hora_ini: "15:00",
 					hora_fin: "22:00",
 					horas: 7,
-					personas_minimas: 9,
+					personas_minimas: 3,
 					personas: []
 				},
 				{
@@ -973,7 +981,7 @@ export class HomeComponent implements OnInit {
 					hora_ini: "22:00",
 					hora_fin: "08:00",
 					horas: 10,
-					personas_minimas: 5,
+					personas_minimas: 3,
 					personas: []
 				}
 			]
@@ -1023,28 +1031,55 @@ export class HomeComponent implements OnInit {
 	 * @param pSel 
 	 */
 	generarCuadrantePersona(pSel: Persona) {
-		console.log(`Nos llega persona ${pSel.ID} con perfil ${pSel.perfil}`)
-		for (let i = 0; i < 15; i++) {
-			this.cuadranteMes.dias.forEach(d => {
-				if (d.numero == i)	//estamos en el día correcto.
+		this.cuadranteMes.dias.forEach(dia => {
+			dia.perfiles.forEach(perfil => {
+				if (perfil.cod == pSel.perfil)	//estamos en el perfil correcto
 				{
-					d.perfiles.forEach(p => {
-						if (p.cod == pSel.perfil)	//estamos en el perfil correcto
-						{
-							//Buscamos el turno con menos porcentaje de gente para este perfil
-							const optimo = this.buscaTurnoOptimo(p.turnos);
+					//Antes de mirar el lugar más optimo, hay que saber si ya se le ha asignado un turno ese día
+					console.log(`Comporbamos si ${pSel.ID} está asignado ya al día ${dia.numero}`)
+					let asignado = this.estoyAsignadoDia(JSON.parse(JSON.stringify(pSel)), JSON.parse(JSON.stringify(dia)));
+					console.log(asignado);
 
-							p.turnos.forEach(t => {
-								if (t.cod == optimo) {
-									t.personas.push(pSel);
-									console.log(`Añadimos persona ${pSel.ID}`)
-								}
-							});
-						}
-					});
+					//Buscamos el turno con menos porcentaje de gente para este perfil
+					if (!asignado) {
+						const optimo = this.buscaTurnoOptimo(perfil.turnos);
+
+						perfil.turnos.forEach(t => {
+							if (t.cod == optimo) {
+								t.personas.push(pSel);
+								console.log(`Añadimos persona ${pSel.ID}`)
+							}
+						});
+					}
 				}
 			});
-		}
+		});
+	}
+
+	/**
+	 * Revisa si estoy asignado ya en algún turno del día dado.
+	 * @param yo 
+	 * @param dia 
+	 */
+	estoyAsignadoDia(yo: Persona, dia: Dia) {
+		let encontrado = false;
+		this.cuadranteMes.dias.forEach(item => {
+			if (item.numero == dia.numero) {
+				item.perfiles.forEach(element => {
+					if (element.cod == yo.perfil) {
+						element.turnos.forEach(turno => {
+							turno.personas.forEach(tipo => {
+								if (tipo.ID == yo.ID) {
+									encontrado = true;
+									return encontrado;
+								}
+							});
+						});
+					}
+				});
+			}
+		});
+		return encontrado;
 	}
 
 	/**
@@ -1056,11 +1091,11 @@ export class HomeComponent implements OnInit {
 	 */
 	buscaTurnoOptimo(turnos: Turno[]): string {
 		console.log(turnos);
+
 		let respuesta = "";	//en caso de que todos los turnos estén completos.
 		let porcentaje = 100;
 
-		console.log("Porcentajes")
-
+		let p: Persona = null;
 		turnos.forEach(turno => {
 			if (turno.personas.length < turno.personas_minimas) {
 				let tmpPorcentaje = (turno.personas.length * 100 / turno.personas_minimas);
@@ -1071,8 +1106,6 @@ export class HomeComponent implements OnInit {
 			}
 		});
 
-
-		console.log(`Respuesta ${respuesta} <--`);
 		return respuesta
 	}
 
