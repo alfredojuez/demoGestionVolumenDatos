@@ -765,8 +765,6 @@ export class HomeComponent implements OnInit {
 		N: 5,
 	};
 
-	cuadranteActual = null;
-
 	months: any[] = [
 		{ id: 1, name: "Enero" },
 		{ id: 2, name: "Febrero" },
@@ -839,6 +837,11 @@ export class HomeComponent implements OnInit {
 		this.cuadranteMes = this.generarListadoDiasXMes(this.selectedMonth, this.selectedYear);
 	}
 
+	rellenarCuadranteMes()
+	{
+		console.log("Solicitado rellenado de cuadrante")
+	}
+
 	listadoFechas = null;
 
 	generarListadoDiasXMes(mes: number, anio: number): Array<{ dia: number; diaSemana: string; personas: string[] }> {
@@ -852,4 +855,9 @@ export class HomeComponent implements OnInit {
 		}
 		return dias;
 	}
+
+
+
+
+
 }
