@@ -1,7 +1,9 @@
 <div class="container mb-5" *ngIf="!estoyLogado()">
 	<div class="row mb-5">
-		<button type="button" class="btn btn-primary mr-2 col-2 mt-4" (click)="comprobarLogin()"><i class="fa fa-user mr-2"></i>Login</button>
-		<button type="button" class="btn btn-primary col-2 mt-4" (click)="comprobarLoginAdmin()"><i class="fa fa-user-shield mr-2"></i>Login as admin</button>
+		<button type="button" class="btn btn-primary mr-2 col-2 mt-4" (click)="comprobarLogin()"><i
+				class="fa fa-user mr-2"></i>Login</button>
+		<button type="button" class="btn btn-primary col-2 mt-4" (click)="comprobarLoginAdmin()"><i
+				class="fa fa-user-shield mr-2"></i>Login as admin</button>
 	</div>
 </div>
 
@@ -30,15 +32,18 @@
 
 				<div class="row mt-4">
 					<form>
-						<label>Numero elementos por página: <input type="number" name="input" [(ngModel)]="numeroElementos" min="1" max="100" required /> </label>
+						<label>Numero elementos por página: <input type="number" name="input"
+								[(ngModel)]="numeroElementos" min="1" max="100" required /> </label>
 					</form>
 				</div>
 			</div>
 
 			<div class="col-4 mt-2">
 				<button type="button" class="btn btn-warning mb-2" (click)="addPersons(5)">Añadir 5 personas</button>
-				<button type="button" class="btn btn-warning mb-2" (click)="addPersons(25000)">Añadir 25.000 personas</button>
-				<button type="button" class="btn btn-warning mb-2" (click)="addPersons(100000)">Añadir 100.000 personas</button>
+				<button type="button" class="btn btn-warning mb-2" (click)="addPersons(25000)">Añadir 25.000
+					personas</button>
+				<button type="button" class="btn btn-warning mb-2" (click)="addPersons(100000)">Añadir 100.000
+					personas</button>
 			</div>
 		</div>
 		<div class="row" *ngIf="!listadoGeneral.length">
@@ -77,8 +82,10 @@
 
 								<td *ngIf="visionExtendidaColumnas">{{ registro.DNI }}</td>
 								<td *ngIf="visionExtendidaColumnas">{{ registro.sexo }}</td>
-								<td *ngIf="visionExtendidaColumnas">{{ registro.fecha_nacimiento | date : "dd MMMM yyyy" }}</td>
-								<td *ngIf="visionExtendidaColumnas">{{ registro.fecha_antiguedad | date : "dd MMMM yyyy" }}</td>
+								<td *ngIf="visionExtendidaColumnas">{{ registro.fecha_nacimiento | date : "dd MMMM yyyy"
+									}}</td>
+								<td *ngIf="visionExtendidaColumnas">{{ registro.fecha_antiguedad | date : "dd MMMM yyyy"
+									}}</td>
 
 								<!-- <td><i class="{{ getIcono(registro.estado) }} fa-2x mr-2" title="{{ registro.estado }}"></i></td> -->
 							</tr>
@@ -94,27 +101,37 @@
 							</div>
 						</div>
 						<div class="mt-4 col-4">
-							<button type="button" [disabled]="disable_boton_atras" class="btn btn-primary ml-4" (click)="irAPagina(paginaActual - 1)">Atras</button>
-							<button type="button" [disabled]="disable_boton_siguiente" class="btn btn-primary ml-2" (click)="irAPagina(paginaActual + 1)">Siguiente</button>
+							<button type="button" [disabled]="disable_boton_atras" class="btn btn-primary ml-4"
+								(click)="irAPagina(paginaActual - 1)">Atras</button>
+							<button type="button" [disabled]="disable_boton_siguiente" class="btn btn-primary ml-2"
+								(click)="irAPagina(paginaActual + 1)">Siguiente</button>
 						</div>
 					</div>
 				</div>
 				<div class="col-4">
 					<div class="container">
 						<div class="row resumenInfo personControl mb-4" *ngIf="personaSeleccionada">
-							<h5 class="col-10 mt-3">Información personal</h5> <h5 class="col-1 mt-3" (click)="cierraInfoPersona()">X</h5>
+							<h5 class="col-10 mt-3">Información personal</h5>
+							<h5 class="col-1 mt-3" (click)="cierraInfoPersona()">X</h5>
 							<div class="col-12"><b>Nombre</b>: {{ personaSeleccionada.nombre }}</div>
 							<div class="col-12"><b>Apellidos</b>: {{ personaSeleccionada.apellidos }}</div>
 							<div class="col-12"><b>ID</b>: {{ personaSeleccionada.ID }}</div>
-							<div class="col-12"><b>Fecha antigüedad</b>: {{ personaSeleccionada.fecha_antiguedad | date : "dd MMMM yyyy" }}</div>
+							<div class="col-12"><b>Fecha antigüedad</b>: {{ personaSeleccionada.fecha_antiguedad | date
+								: "dd MMMM yyyy" }}</div>
 							<div class="col-12"><b>Perfil</b>: {{ getLiteralPerfil(personaSeleccionada.perfil) }}</div>
 							<div class="col-12"><b>DNI</b>: {{ personaSeleccionada.DNI }}</div>
 							<div class="col-12"><b>Sexo</b>: {{ personaSeleccionada.sexo }}</div>
-							<div class="col-12"><b>Fecha nacimiento</b>: {{ personaSeleccionada.fecha_nacimiento | date : "dd MMMM yyyy" }}</div>
+							<div class="col-12"><b>Fecha nacimiento</b>: {{ personaSeleccionada.fecha_nacimiento | date
+								: "dd MMMM yyyy" }}</div>
 							<div class="col-12"><b>Direccion</b>:</div>
 							<div class="col-12"><b>Calle</b>: {{ personaSeleccionada.calle }}</div>
 							<div class="col-12"><b>Nº</b>: {{ personaSeleccionada.numero }}</div>
 							<div class="col-12 mb-2"><b>Piso</b>: {{ personaSeleccionada.piso }}</div>
+
+							<button type="button" class="btn btn-success col-12"
+								[disabled]="!cuadranteMes"
+								(click)="generarCuadrantePersona(personaSeleccionada)">Generar Cuadrante</button>
+
 						</div>
 
 						<div class="row resumenInfo personControl mb-4" *ngIf="!personaSeleccionada">
@@ -142,15 +159,18 @@
 
 			<form name="row espaciado-lateral">
 				<div class="enLinea espaciado-lateral mt-3">
-					<input class="w70" type="number" name="Mañana" [(ngModel)]="personasMinimasXTurnos.M" min="1" max="100" required />
+					<input class="w70" type="number" name="Mañana" [(ngModel)]="personasMinimasXTurnos.M" min="1"
+						max="100" required />
 					<div class="">[M]añana</div>
 				</div>
 				<div class="enLinea mr-3">
-					<input class="w70" type="number" name="Tarde" [(ngModel)]="personasMinimasXTurnos.T" min="1" max="100" required />
+					<input class="w70" type="number" name="Tarde" [(ngModel)]="personasMinimasXTurnos.T" min="1"
+						max="100" required />
 					<div class="">[T]arde</div>
 				</div>
 				<div class="enLinea mb-3">
-					<input class="w70" type="number" name="Noche" [(ngModel)]="personasMinimasXTurnos.N" min="1" max="100" required />
+					<input class="w70" type="number" name="Noche" [(ngModel)]="personasMinimasXTurnos.N" min="1"
+						max="100" required />
 					<div class="">[N]oche</div>
 				</div>
 			</form>
@@ -162,32 +182,38 @@
 					<option *ngFor="let month of months" [value]="month.id">{{ month.name }}</option>
 				</select>
 				<div class="ml-1 mr-1">de</div>
-				<input class="w70" type="number" name="anio" [(ngModel)]="selectedYear" min="2022" max="2050" required />
+				<input class="w70" type="number" name="anio" [(ngModel)]="selectedYear" min="2022" max="2050"
+					required />
 			</div>
 		</div>
 
 		<div class="ml-1 cuadranteLight w400">
 			<label class="espaciado-lateral mt-2">Se repetira un turno cada: </label>
 
-			<table class="espaciado-lateral mb-2 col-12" >
+			<table class="espaciado-lateral mb-2 col-12">
 				<tr *ngFor="let item of delays">
 					<td class="w100">{{ getLiteralPerfil(item.perfil) }}</td>
 					<td>
 						<div class="">Días de trab.</div>
-						<input class="w50" type="number" name="`trabajo${item.perfil}`" [(ngModel)]="item.dias" min="1" max="30" required />
+						<input class="w50" type="number" name="`trabajo${item.perfil}`" [(ngModel)]="item.dias" min="1"
+							max="30" required />
 					</td>
 					<td>
 						<div class="">Días de desc.</div>
-						<input class="w50" type="number" name="`descanso${item.perfil}`" [(ngModel)]="item.descansos" min="1" max="30" required />
+						<input class="w50" type="number" name="`descanso${item.perfil}`" [(ngModel)]="item.descansos"
+							min="1" max="30" required />
 					</td>
 				</tr>
 			</table>
 		</div>
 
 		<div class="col-12 mt-4 mb-4">
-			<button type="button" [disabled]="!cuadranteMes" class="btn btn-warning" (click)="cuadranteMes=null">Limpiar cuadrantes</button>
-			<button type="button" class="btn btn-warning ml-2" (click)="crearCuadranteMes()">Crear cuadrante mes</button>
-			<button type="button" [disabled]="!cuadranteMes" class="btn btn-warning ml-2" (click)="rellenarCuadranteMes()">Rellenar cuadrante del mes</button>
+			<button type="button" [disabled]="!cuadranteMes" class="btn btn-warning" (click)="cuadranteMes=null">Limpiar
+				cuadrantes</button>
+			<button type="button" class="btn btn-warning ml-2" (click)="crearCuadranteMes()">Crear cuadrante
+				mes</button>
+			<button type="button" [disabled]="!cuadranteMes" class="btn btn-warning ml-2"
+				(click)="rellenarCuadranteMes()">Rellenar cuadrante del mes</button>
 		</div>
 	</div>
 
@@ -202,18 +228,47 @@
 			<table class="col-12 ml-4 mb-4">
 				<thead>
 					<!-- <th class="heading">&nbsp;</th> -->
-					<th class="heading col-1">Dia</th>
+					<th class="heading col-1">
+						<h5>Dia</h5>
+					</th>
 					<th class="heading col-1"></th>
-					<th class="heading">Tecnicos</th>
+					<th class="heading">
+						<h5>Técnicos</h5>
+					</th>
 				</thead>
 				<tbody *ngFor="let item of cuadranteMes.dias; let indice = index">
-					<tr>
+					<tr class="infoTabla">
 						<!-- <td class="heading">{{ indice + 1 }}</td> -->
 						<td>
-							{{ item.diaSemana }}
+							<h5 class="ml-2">
+								{{ item.diaSemana }}
+							</h5>
 						</td>
-						<td>{{ item.numero }}</td>
-						<td>{{ item.perfiles }}</td>
+						<td>
+							<h5>{{ item.numero }}</h5>
+						</td>
+						<td>
+							<div class="panelControl  mb-1" *ngFor="let perfil of item.perfiles">
+								<div class="col-3">{{perfil.nombre}}</div>
+								<div class="infoTabla">
+									<div class="row" *ngFor="let turno of perfil.turnos">
+										<div class="col-1 ml-3">
+
+											{{ turno.cod | json }}
+										</div>
+										<div class="col-10">
+
+											{{ turno.personas?.length | json }} de {{turno.personas_minimas}}
+											<div class="div"  *ngFor="let person of turno.personas">
+												{{person.ID}} - 
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+
+						</td>
+
 					</tr>
 				</tbody>
 			</table>

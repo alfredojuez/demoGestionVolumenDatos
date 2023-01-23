@@ -19,28 +19,29 @@ interface Persona {
 }
 
 interface Turno {
-	cod: String;
+	cod: string;
 	horas: number;
-	hora_ini: Time;
-	hora_fin: Time;
-	personas: Persona[];
+	hora_ini: string;
+	hora_fin: string;
+	personas_minimas: number,
+	personas: Array<Persona>;
 }
 
 interface Perfil {
-	cod: string;
+	cod: number;
 	nombre: string;
-	turnos: Turno[];
+	turnos: Array<Turno>;
 }
 
 interface Dia {
-	numero: Number;
+	numero: number;
 	diaSemana: string
-	perfiles: Perfil[];
+	perfiles: Array<Perfil>;
 }
 
 interface Mes {
-	numeroMes: Number;
-	dias: Dia[];
+	numeroMes: number;
+	dias: Array<Dia>;
 }
 
 @Component({
@@ -856,8 +857,14 @@ export class HomeComponent implements OnInit {
 		};
 	}
 
+	/**
+	 * Para cada persona vamos a decirle que genere su cuadrante.
+	 */
 	rellenarCuadranteMes() {
 		console.log("Solicitado rellenado de cuadrante")
+		this.listadoGeneral.forEach(persona => {
+			this.generarCuadrantePersona(persona);
+		});
 	}
 
 	listadoFechas = null;
@@ -868,11 +875,205 @@ export class HomeComponent implements OnInit {
 		const dias: Array<Dia> = [];
 		for (let numero = 1; numero <= ultimoDia; numero++) {
 			fecha.setDate(numero);
-			const diaSemana = fecha.toLocaleString("default", { weekday: "long" });
-			let tmp: Dia = { numero, diaSemana, perfiles: [] };
-			dias.push(tmp); // es lo mismo que (dia:dia, diaSemana:diaSemana , personas:[])
+			dias.push({
+				numero,
+				diaSemana: fecha.toLocaleString("default", { weekday: "long" }),
+				perfiles: JSON.parse(JSON.stringify(this.perfilesVacios))		//para que sea copia no referencia
+			}); // es lo mismo que (dia:dia, diaSemana:diaSemana , personas:[])
 		}
 		return dias;
+	}
+
+
+
+
+	perfilesVacios = [
+		{
+			cod: 1,
+			nombre: "Operador demanda",
+			turnos: [
+				{
+					cod: "M",
+					hora_ini: "08:00",
+					hora_fin: "15:00",
+					horas: 7,
+					personas_minimas: 5,
+					personas: []
+				},
+				{
+					cod: "T",
+					hora_ini: "15:00",
+					hora_fin: "22:00",
+					horas: 7,
+					personas_minimas: 5,
+					personas: []
+				},
+				{
+					cod: "N",
+					hora_ini: "22:00",
+					hora_fin: "08:00",
+					horas: 10,
+					personas_minimas: 7,
+					personas: []
+				}
+			]
+		},
+		{
+			cod: 2,
+			nombre: "Operador respuesta",
+			turnos: [
+				{
+					cod: "M",
+					hora_ini: "08:00",
+					hora_fin: "15:00",
+					horas: 7,
+					personas_minimas: 15,
+					personas: []
+				},
+				{
+					cod: "T",
+					hora_ini: "15:00",
+					hora_fin: "22:00",
+					horas: 7,
+					personas_minimas: 15,
+					personas: []
+				},
+				{
+					cod: "N",
+					hora_ini: "22:00",
+					hora_fin: "08:00",
+					horas: 10,
+					personas_minimas: 15,
+					personas: []
+				}
+			]
+		},
+		{
+			cod: 3,
+			nombre: "GPEX",
+			turnos: [
+				{
+					cod: "M",
+					hora_ini: "08:00",
+					hora_fin: "15:00",
+					horas: 7,
+					personas_minimas: 9,
+					personas: []
+				},
+				{
+					cod: "T",
+					hora_ini: "15:00",
+					hora_fin: "22:00",
+					horas: 7,
+					personas_minimas: 9,
+					personas: []
+				},
+				{
+					cod: "N",
+					hora_ini: "22:00",
+					hora_fin: "08:00",
+					horas: 10,
+					personas_minimas: 5,
+					personas: []
+				}
+			]
+		},
+		{
+			cod: 4,
+			nombre: "Jefe de Sala",
+			turnos: [
+				{
+					cod: "A",
+					hora_ini: "08:00",
+					hora_fin: "20:00",
+					horas: 12,
+					personas_minimas: 2,
+					personas: []
+				},
+				{
+					cod: "P",
+					hora_ini: "20:00",
+					hora_fin: "08:00",
+					horas: 12,
+					personas_minimas: 2,
+					personas: []
+				}
+			]
+		},
+		{
+			cod: 5,
+			nombre: "J2",
+			turnos: [
+				{
+					cod: "D",
+					hora_ini: "08:00",
+					hora_fin: "08:00",
+					horas: 24,
+					personas_minimas: 1,
+					personas: []
+				}
+			]
+		}
+	]
+
+
+	/**
+	 * Rellena en cuadranteMes los datos del técnico en los turnos 
+	 * que corresponda atendiendo a la parametrización
+	 * @param pSel 
+	 */
+	generarCuadrantePersona(pSel: Persona) {
+		console.log(`Nos llega persona ${pSel.ID} con perfil ${pSel.perfil}`)
+		for (let i = 0; i < 15; i++) {
+			this.cuadranteMes.dias.forEach(d => {
+				if (d.numero == i)	//estamos en el día correcto.
+				{
+					d.perfiles.forEach(p => {
+						if (p.cod == pSel.perfil)	//estamos en el perfil correcto
+						{
+							//Buscamos el turno con menos porcentaje de gente para este perfil
+							const optimo = this.buscaTurnoOptimo(p.turnos);
+
+							p.turnos.forEach(t => {
+								if (t.cod == optimo) {
+									t.personas.push(pSel);
+									console.log(`Añadimos persona ${pSel.ID}`)
+								}
+							});
+						}
+					});
+				}
+			});
+		}
+	}
+
+	/**
+	 * En función de los turnos de este perfil, miramos cual no está completo y en ese caso, 
+	 * cual está menos saturado
+	 * @param turnos 
+	 * @returns Devuelve el codigo del turno o la cadena vacía si están completos todos los 
+	 * turnos
+	 */
+	buscaTurnoOptimo(turnos: Turno[]): string {
+		console.log(turnos);
+		let respuesta = "";	//en caso de que todos los turnos estén completos.
+		let porcentaje = 100;
+
+		console.log("Porcentajes")
+
+		turnos.forEach(turno => {
+			if (turno.personas.length < turno.personas_minimas) {
+				let tmpPorcentaje = (turno.personas.length * 100 / turno.personas_minimas);
+				if (porcentaje > tmpPorcentaje) {
+					respuesta = turno.cod;
+					porcentaje = tmpPorcentaje;
+				}
+			}
+		});
+
+
+		console.log(`Respuesta ${respuesta} <--`);
+		return respuesta
 	}
 
 }
