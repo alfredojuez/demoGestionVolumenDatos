@@ -158,7 +158,7 @@
 			</div>
 		</div>
 		<div class="col-12 mt-4 mb-4">
-			<button type="button" [disabled]="!cuadranteActual" class="btn btn-warning">Limpiar cuadrantes</button>
+			<button type="button" [disabled]="!cuadranteMes" class="btn btn-warning" (click)="cuadranteMes=null">Limpiar cuadrantes</button>
 			<button type="button" class="btn btn-warning ml-2" (click)="crearCuadranteMes()">Crear cuadrante mes</button>
 			<button type="button" [disabled]="!cuadranteMes" class="btn btn-warning ml-2" (click)="rellenarCuadranteMes()">Rellenar cuadrante del mes</button>
 		</div>

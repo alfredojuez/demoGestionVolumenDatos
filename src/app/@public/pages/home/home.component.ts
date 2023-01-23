@@ -760,8 +760,6 @@ export class HomeComponent implements OnInit {
 		N: 5,
 	};
 
-	cuadranteActual = null;
-
 	months: any[] = [
 		{ id: 1, name: "Enero" },
 		{ id: 2, name: "Febrero" },
@@ -818,4 +816,9 @@ export class HomeComponent implements OnInit {
 		}
 		return dias;
 	}
+
+
+
+
+
 }
