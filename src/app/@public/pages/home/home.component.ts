@@ -108,6 +108,39 @@ export class HomeComponent implements OnInit {
 	estiloSeleccionado = "2007";
 	visionExtendidaColumnas = false;
 
+	columnaOrdenada = "ID";
+	direccionOrdenASC = true;
+
+	/**
+	 * Nos dice si quieren cambiar el tipo de ordenación o la columna 
+	 * de ordenación sobre la que se ha pulsado.
+	 */
+	gestionOrdenacion(col: string) {
+		// Si pulsan sobre la columna ordenada, es que cambiemos el orden
+		if (col == this.columnaOrdenada) {
+			this.direccionOrdenASC = !this.direccionOrdenASC;
+		}
+		else {
+			this.columnaOrdenada = col;
+			this.direccionOrdenASC = true;	//Por defecto siempre ASC la primera vez
+		}
+	}
+
+	/**
+	 * Nos devuelve el icono que tiene que pintar en cada columna solicitada.
+	 * @param col 
+	 * @returns 
+	 */
+	gestionIconoOrdenacion(col: string) {
+		//por defecto icono neutro
+		let respuesta ="";
+		// "../../../../assets/imgs/neutro2.png";
+		if (col == this.columnaOrdenada) {
+			respuesta = (this.direccionOrdenASC ? "../../../../assets/imgs/a-z.png" : "../../../../assets/imgs/z-a.png")
+		}
+		return respuesta;
+	}
+
 	/**
 	 * Carga la clase que le indiquemos para el excel
 	 * @param valor
@@ -175,11 +208,58 @@ export class HomeComponent implements OnInit {
 	}
 
 	getListadoGeneralFiltrado() {
+		// hay que tener en cuenta:
+		// columnaOrdenada = "ID";
+		// direccionOrdenASC = true;
 		let comienzo = this.paginaActual * this.numeroElementos;
 		let final = comienzo + this.numeroElementos;
 		this.paginaMaxima = Math.floor(this.listadoGeneral.length / this.numeroElementos);
 		this.compruebaBotonesPaginado();
-		return this.listadoGeneral.slice(comienzo, final);
+		//Hacemos una copia para ordenarla.
+		let listadoTMP = this.listadoGeneral.slice(0, this.listadoGeneral.length - 1);
+
+		let valor = this.columnaOrdenada;
+		listadoTMP.sort(function (a, b,) {
+			let orden = 0;
+			switch (valor) {
+				case "ID":
+					orden = (a.ID > b.ID) ? 1 : -1;
+					break;
+				case "nombre":
+					orden = (a.nombre > b.nombre) ? 1 : -1;
+					break;
+				case "apellidos":
+					orden = (a.apellidos > b.apellidos) ? 1 : -1;
+					break;
+				case "perfil":
+					orden = (a.perfil > b.perfil) ? 1 : -1;
+					break;
+				case "DNI":
+					orden = (a.DNI > b.DNI) ? 1 : -1;
+					break;
+				case "sexo":
+					orden = (a.sexo > b.sexo) ? 1 : -1;
+					break;
+				case "fecha_nacimiento":
+					orden = (a.fecha_nacimiento > b.fecha_nacimiento) ? 1 : -1;
+					break;
+				case "fecha_antiguedad":
+					orden = (a.ID > b.fecha_antiguedad) ? 1 : -1;
+					break;
+
+				default:
+					orden = 0;
+					break;
+			}
+
+			return orden;
+		});
+
+		if (!this.direccionOrdenASC) {
+			listadoTMP.reverse();
+		}
+		
+		return listadoTMP.slice(comienzo, final);
 	}
 	/*** Fin sistema de paginado */
 
@@ -786,11 +866,11 @@ export class HomeComponent implements OnInit {
 	 *
 	 */
 
-	personasMinimasXTurnos = {
-		M: 10,
-		T: 10,
-		N: 5,
-	};
+	// personasMinimasXTurnos = {
+	// 	M: 10,
+	// 	T: 10,
+	// 	N: 5,
+	// };
 
 	months: any[] = [
 		{ id: 1, name: "Enero" },
@@ -820,9 +900,7 @@ export class HomeComponent implements OnInit {
 
 	selectedMonth = 1;
 	selectedYear = 2023;
-
 	cuadranteMes: Mes = null;
-
 
 	crearCuadranteMes() {
 		this.cuadranteMes = {
@@ -830,8 +908,6 @@ export class HomeComponent implements OnInit {
 			dias: this.generarListadoDiasXMes(this.selectedMonth, this.selectedYear)
 		};
 	}
-
-
 
 
 	realizandoCalculos = false;
@@ -908,18 +984,27 @@ export class HomeComponent implements OnInit {
 							if (!this.estoyAsignadoDia(JSON.parse(JSON.stringify(pSel)), JSON.parse(JSON.stringify(dia)))) {
 								const optimo = this.buscaTurnoOptimo(perfil.turnos, ultimoTurno);
 								let turnoAsignado = false;
-								perfil.turnos.forEach(turno => {
-									if (turno.cod == optimo) {
-										ultimoTurno = optimo;
-										turnoAsignado = true;
-										turno.personas.push(pSel);
-										contadorDiasTrabajo++;
-										if (contadorDiasTrabajo >= perfil.dias_trabajo) {
-											busquedaTrabajo = false;
-											contadorDiasTrabajo = 0;
+								if (optimo != "") {	//Si se ha encontrado turno para ese día....
+									perfil.turnos.forEach(turno => {
+										if (turno.cod == optimo) {
+											ultimoTurno = optimo;
+											turnoAsignado = true;
+											turno.personas.push(pSel);
+											contadorDiasTrabajo++;
+											if (contadorDiasTrabajo >= perfil.dias_trabajo) {
+												busquedaTrabajo = false;
+												contadorDiasTrabajo = 0;
+											}
 										}
-									}
-								});
+									});
+								}
+								else {
+									// En este caso que hacemos?
+									// Si no hay hueco para ir a trabajar hay que dar salto en vacaciones o 
+									// Se añade al cuadrante y se indica el exceso de gente?
+									console.log("VACIO");
+
+								}
 								//Si los turnos estaban completos... y no se asigna turno, el numero de días trabajados se pone a 0
 								if (!turnoAsignado) { contadorDiasTrabajo = 0; }
 							}
@@ -989,21 +1074,21 @@ export class HomeComponent implements OnInit {
 			// 		this.cdRef.markForCheck();
 			// 	}
 			// }
-
+			if (ultimoTurno == "N") {
+				console.log("PARAR AQUI")
+			}
 			//Si no hay ultimo turno, el más optimo de todos los que haya
-			if(ultimoTurno=="")
-			{	
+			if (ultimoTurno == "") {
 				if (turno.personas.length < turno.personas_minimas) {
 					let tmpPorcentaje = (turno.personas.length * 100 / turno.personas_minimas);
-					console.log(`Turno ${turno.cod} -> ${tmpPorcentaje} de personas`)
+					// console.log(`Turno ${turno.cod} -> ${tmpPorcentaje} de personas`)
 					if (porcentaje > tmpPorcentaje) {
 						respuesta = turno.cod;
 						porcentaje = tmpPorcentaje;
 					}
 				}
 			}
-			else
-			{
+			else {
 				if (ultimoTurno == turno.cod) {
 					proximo = true;
 				}
@@ -1022,11 +1107,18 @@ export class HomeComponent implements OnInit {
 
 		});
 
-		//si llegamos aqui y proximo es true, es que estábamos en el ultimo turno, y lo que le corresponde es el primero
-		if(proximo)
-		{
-			respuesta = turnos[0].cod;
+		// Si llegamos aqui y proximo es true, es que estábamos en el ultimo turno, 
+		// y lo que le corresponde es el primero
+		if (proximo) {
+			for (let i = 0; i < turnos.length - 1; i++) {
+				let tmpPorcentaje = (turnos[i].personas.length * 100 / turnos[i].personas_minimas);
+				if (porcentaje > tmpPorcentaje) {
+					respuesta = turnos[i].cod;
+					porcentaje = tmpPorcentaje;
+				}
+			}
 		}
+
 		return respuesta
 	}
 
@@ -1054,6 +1146,7 @@ export class HomeComponent implements OnInit {
 			nombre: "Operador demanda",
 			dias_trabajo: 3,
 			dias_descansos: 2,
+			procesable: true,
 			turnos: [
 				{
 					cod: "M",
@@ -1086,6 +1179,7 @@ export class HomeComponent implements OnInit {
 			nombre: "Operador respuesta",
 			dias_trabajo: 3,
 			dias_descansos: 2,
+			procesable: true,
 			turnos: [
 				{
 					cod: "M",
@@ -1118,6 +1212,7 @@ export class HomeComponent implements OnInit {
 			nombre: "GPEX",
 			dias_trabajo: 3,
 			dias_descansos: 3,
+			procesable: false,
 			turnos: [
 				{
 					cod: "M",
@@ -1150,6 +1245,7 @@ export class HomeComponent implements OnInit {
 			nombre: "Jefe de Sala",
 			dias_trabajo: 1,
 			dias_descansos: 2,
+			procesable: false,
 			turnos: [
 				{
 					cod: "A",
@@ -1174,6 +1270,7 @@ export class HomeComponent implements OnInit {
 			nombre: "J2",
 			dias_trabajo: 2,
 			dias_descansos: 4,
+			procesable: false,
 			turnos: [
 				{
 					cod: "D",

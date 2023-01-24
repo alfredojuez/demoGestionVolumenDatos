@@ -15,8 +15,8 @@
 			<div class="ml-4">
 				<h2>Gestión de personal</h2>
 			</div>
-			<div class="row ml-5">
-				<div class="row ">
+			<div class="row ml-3">
+				<div class=" ">
 					<input type="checkbox" (change)="ChangeClass($event)" checked />
 					Estilo de los datos mejorado
 				</div>
@@ -28,13 +28,14 @@
 					<label>Elementos x página: <input type="number" name="input" [(ngModel)]="numeroElementos" min="1"
 							max="100" required /> </label>
 				</form>
-				<div class="">
-					<button type="button" class="btn btn-warning ml-2" (click)="addPersons(5)">+ 5
-						pers.</button>
-					<button type="button" class="btn btn-warning ml-2" (click)="addPersons(500)">+ 500
-						pers.</button>
-					<button type="button" class="btn btn-warning ml-2" (click)="addPersons(5000)">+ 5.000
-						pers.</button>
+			</div>
+			<div class="row ml-3">
+				<div class="mb-2">
+					Añadir al listado
+					<button type="button" class="btn btn-warning ml-2" (click)="addPersons(5)">+ 5 </button>
+					<button type="button" class="btn btn-warning ml-2" (click)="addPersons(50)">+ 50 </button>
+					<button type="button" class="btn btn-warning ml-2" (click)="addPersons(500)">+ 500 </button>
+					<span class="ml-2">personas</span>
 				</div>
 			</div>
 		</div>
@@ -58,15 +59,37 @@
 					<table class="{{ ChangeTableClass() }} col-12">
 						<thead>
 							<th class="heading">&nbsp;</th>
-							<th class="heading">ID</th>
-							<th class="heading">Nombre</th>
-							<th class="heading">Apellidos</th>
-							<th class="heading">Perfil</th>
+							<th class="heading" (click)="gestionOrdenacion('ID')">ID
+								<img width="18px" style="float: right; " src="{{gestionIconoOrdenacion('ID')}}">
+							</th>
+							<th class="heading" (click)="gestionOrdenacion('nombre')">
+								Nombre
+								<img width="18px" style="float: right; " src="{{gestionIconoOrdenacion('nombre')}}">
+							</th>
+							<th class="heading" (click)="gestionOrdenacion('apellidos')">Apellidos
+								<img width="18px" style="float: right; " src="{{gestionIconoOrdenacion('apellidos')}}">
 
-							<th class="heading" *ngIf="visionExtendidaColumnas">DNI</th>
-							<th class="heading" *ngIf="visionExtendidaColumnas">Sexo</th>
-							<th class="heading" *ngIf="visionExtendidaColumnas">Fecha de Nacimiento</th>
-							<th class="heading" *ngIf="visionExtendidaColumnas">Fecha de Antiguedad</th>
+							</th>
+							<th class="heading" (click)="gestionOrdenacion('perfil')">Perfil
+								<img width="18px" style="float: right; " src="{{gestionIconoOrdenacion('perfil')}}">
+							</th>
+
+							<th class="heading" *ngIf="visionExtendidaColumnas" (click)="gestionOrdenacion('DNI')">DNI
+								<img width="18px" style="float: right; " src="{{gestionIconoOrdenacion('DNI')}}">
+							</th>
+							<th class="heading" *ngIf="visionExtendidaColumnas" (click)="gestionOrdenacion('sexo')">Sexo
+								<img width="18px" style="float: right; " src="{{gestionIconoOrdenacion('sexo')}}">
+							</th>
+							<th class="heading" *ngIf="visionExtendidaColumnas"
+								(click)="gestionOrdenacion('fecha_nacimiento')">Fecha de Nacimiento
+								<img width="18px" style="float: right; "
+									src="{{gestionIconoOrdenacion('fecha_nacimiento')}}">
+							</th>
+							<th class="heading" *ngIf="visionExtendidaColumnas"
+								(click)="gestionOrdenacion('fecha_antiguedad')">Fecha de Antiguedad
+								<img width="18px" style="float: right; "
+									src="{{gestionIconoOrdenacion('fecha_antiguedad')}}">
+							</th>
 						</thead>
 						<tbody *ngFor="let registro of getListadoGeneralFiltrado(); let indice = index">
 							<tr (click)="seleccionaPersona(registro)">
@@ -153,20 +176,65 @@
 		</div>
 
 
+		<!-- xxxxxxxxxxxxxxxxxxx -->
 		<div class="ml-1 cuadranteLight w300">
-			<label class="espaciado-lateral mt-2">El cuadrante se creará para la fecha....</label>
-			<div class="row espaciado-lateral mt-2">
-				<select [(ngModel)]="selectedMonth" class="w100">
-					<option *ngFor="let month of months" [value]="month.id">{{ month.name }}</option>
-				</select>
-				<div class="ml-1 mr-1">de</div>
-				<input class="w70" type="number" name="anio" [(ngModel)]="selectedYear" min="2022" max="2050"
-					required />
+			<label class="espaciado-lateral mt-2">Se repetira un turno cada: </label>
+			<div class="row">
+				<table class=" mb-2 col-10 ml-4 infoTabla">
+					<tr *ngFor="let item of perfilesVacios" class="infoTabla">
+						<td class="w100">{{ item.nombre }}</td>
+						<td>
+							<div class="">Días de trab.</div>
+							<input class="w50" type="number" name="`trabajo${item.cod}`" [(ngModel)]="item.dias_trabajo"
+								min="1" max="30" required />
+						</td>
+						<td>
+							<div class="">Días de desc.</div>
+							<input class="w50" type="number" name="`descanso${item.cod}`"
+								[(ngModel)]="item.dias_descansos" min="1" max="30" required />
+						</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+		<!-- xxxxxxxxxxxxxxxxxxx -->
+
+
+		<!-- xxxxxxxxxxxxxxxxxxx -->
+		<div class="w300">
+			<div class="ml-1 mb-1 cuadranteLight w300">
+				<h5 class="ml-3">
+					Mes del cuadrante:
+				</h5>
+
+				<div class="row espaciado-lateral mt-2 mb-1">
+					<select [(ngModel)]="selectedMonth" class="w100">
+						<option *ngFor="let month of months" [value]="month.id">{{ month.name }}</option>
+					</select>
+					<div class="ml-1 mr-1">de</div>
+					<input class="w70" type="number" name="anio" [(ngModel)]="selectedYear" min="2022" max="2050"
+						required />
+				</div>
+			</div>
+			<div class="ml-1 mb-1  cuadranteLight w300 ">
+				<h5 class="ml-3">
+					Perfiles a procesar:
+				</h5>
+				<div *ngFor="let perfil of perfilesVacios">
+
+					<div class="ml-5 ">
+						<input type="checkbox" [(ngModel)]="perfil.procesable"/>
+						{{ perfil.nombre }}
+					</div>
+
+				</div>
+			</div>
+			<div class="ml-1 cuadranteLight w300 h120">
+				Turnos por perfiles y sus valores.
 			</div>
 		</div>
 
-
-		<div class="ml-1 cuadranteLight w300">
+		<!-- <div class="ml-1 cuadranteLight w300">
 			<div class="row espaciado-lateral mt-2">Hay tres turnos con un número mínimo de personas por turno</div>
 
 			<form name="row espaciado-lateral">
@@ -186,29 +254,7 @@
 					<div class="">[N]oche</div>
 				</div>
 			</form>
-		</div>
-
-
-		<div class="ml-1 cuadranteLight w400">
-			<label class="espaciado-lateral mt-2">Se repetira un turno cada: </label>
-
-			<table class="espaciado-lateral mb-2 col-12">
-				<tr *ngFor="let item of perfilesVacios">
-					<td class="w100">{{ item.nombre }}</td>
-					<td>
-						<div class="">Días de trab.</div>
-						<input class="w50" type="number" name="`trabajo${item.cod}`" [(ngModel)]="item.dias_trabajo"
-							min="1" max="30" required />
-					</td>
-					<td>
-						<div class="">Días de desc.</div>
-						<input class="w50" type="number" name="`descanso${item.cod}`" [(ngModel)]="item.dias_descansos"
-							min="1" max="30" required />
-					</td>
-				</tr>
-			</table>
-
-		</div>
+		</div> -->
 
 		<div class="col-12 mt-4 mb-4">
 			<button type="button" [disabled]="!cuadranteMes" class="btn btn-warning"
@@ -224,20 +270,20 @@
 	</div>
 
 
-	
+
 	<div style="text-align: center;" *ngIf="realizandoCalculos">
 		<img src="../../../../assets/gifs/loading.gif" alt="centered image" height="64" width="64">
 	</div>
 
 	<div class="row resumenInfo personControl mb-4">
-		<div class="col-12 ml-4" *ngIf="cuadranteMes">
+		<div class="col-12 ml-1" *ngIf="cuadranteMes">
 			<h4>Cuadrante del mes de {{ getLiteralMonth(selectedMonth) }} de {{ selectedYear }}</h4>
 		</div>
 
 		<!-- CUADRANTE -->
 
 		<div class="col-12" *ngIf="cuadranteMes">
-			<table class="col-12 ml-4 mb-4">
+			<table class="col-12 mb-4">
 				<thead>
 					<!-- <th class="heading">&nbsp;</th> -->
 					<th class="heading col-1">
