@@ -2,7 +2,6 @@ import { estadosService } from "./../../services/estados.service";
 import { Component, OnInit } from "@angular/core";
 import { Router } from "@angular/router";
 import { UserinfoService } from "../../services/userinfo.service";
-import { removeSummaryDuplicates } from "@angular/compiler";
 
 interface Persona {
 	nombre: string;
@@ -18,13 +17,41 @@ interface Persona {
 	piso: string;
 }
 
+interface Turno {
+	cod: string;
+	horas: number;
+	hora_ini: string;
+	hora_fin: string;
+	personas_minimas: number,
+	personas: Array<Persona>;
+}
+
+interface Perfil {
+	cod: number;
+	nombre: string;
+	dias_trabajo: number,
+	dias_descansos: number,
+	turnos: Array<Turno>;
+}
+
+interface Dia {
+	numero: number;
+	diaSemana: string
+	perfiles: Array<Perfil>;
+}
+
+interface Mes {
+	numeroMes: number;
+	dias: Array<Dia>;
+}
+
 @Component({
 	selector: "app-home",
 	templateUrl: "./home.component.html",
 	styleUrls: ["./home.component.scss"],
 })
 export class HomeComponent implements OnInit {
-	constructor(private userService: UserinfoService, private router: Router, public estados: estadosService) {}
+	constructor(private userService: UserinfoService, private router: Router, public estados: estadosService) { }
 
 	//ESTO podría ir en un JSON
 	listadoGeneral = [];
@@ -80,6 +107,39 @@ export class HomeComponent implements OnInit {
 
 	estiloSeleccionado = "2007";
 	visionExtendidaColumnas = false;
+
+	columnaOrdenada = "ID";
+	direccionOrdenASC = true;
+
+	/**
+	 * Nos dice si quieren cambiar el tipo de ordenación o la columna 
+	 * de ordenación sobre la que se ha pulsado.
+	 */
+	gestionOrdenacion(col: string) {
+		// Si pulsan sobre la columna ordenada, es que cambiemos el orden
+		if (col == this.columnaOrdenada) {
+			this.direccionOrdenASC = !this.direccionOrdenASC;
+		}
+		else {
+			this.columnaOrdenada = col;
+			this.direccionOrdenASC = true;	//Por defecto siempre ASC la primera vez
+		}
+	}
+
+	/**
+	 * Nos devuelve el icono que tiene que pintar en cada columna solicitada.
+	 * @param col 
+	 * @returns 
+	 */
+	gestionIconoOrdenacion(col: string) {
+		//por defecto icono neutro
+		let respuesta ="";
+		// "../../../../assets/imgs/neutro2.png";
+		if (col == this.columnaOrdenada) {
+			respuesta = (this.direccionOrdenASC ? "../../../../assets/imgs/a-z.png" : "../../../../assets/imgs/z-a.png")
+		}
+		return respuesta;
+	}
 
 	/**
 	 * Carga la clase que le indiquemos para el excel
@@ -148,11 +208,58 @@ export class HomeComponent implements OnInit {
 	}
 
 	getListadoGeneralFiltrado() {
+		// hay que tener en cuenta:
+		// columnaOrdenada = "ID";
+		// direccionOrdenASC = true;
 		let comienzo = this.paginaActual * this.numeroElementos;
 		let final = comienzo + this.numeroElementos;
 		this.paginaMaxima = Math.floor(this.listadoGeneral.length / this.numeroElementos);
 		this.compruebaBotonesPaginado();
-		return this.listadoGeneral.slice(comienzo, final);
+		//Hacemos una copia para ordenarla.
+		let listadoTMP = this.listadoGeneral.slice(0, this.listadoGeneral.length - 1);
+
+		let valor = this.columnaOrdenada;
+		listadoTMP.sort(function (a, b,) {
+			let orden = 0;
+			switch (valor) {
+				case "ID":
+					orden = (a.ID > b.ID) ? 1 : -1;
+					break;
+				case "nombre":
+					orden = (a.nombre > b.nombre) ? 1 : -1;
+					break;
+				case "apellidos":
+					orden = (a.apellidos > b.apellidos) ? 1 : -1;
+					break;
+				case "perfil":
+					orden = (a.perfil > b.perfil) ? 1 : -1;
+					break;
+				case "DNI":
+					orden = (a.DNI > b.DNI) ? 1 : -1;
+					break;
+				case "sexo":
+					orden = (a.sexo > b.sexo) ? 1 : -1;
+					break;
+				case "fecha_nacimiento":
+					orden = (a.fecha_nacimiento > b.fecha_nacimiento) ? 1 : -1;
+					break;
+				case "fecha_antiguedad":
+					orden = (a.ID > b.fecha_antiguedad) ? 1 : -1;
+					break;
+
+				default:
+					orden = 0;
+					break;
+			}
+
+			return orden;
+		});
+
+		if (!this.direccionOrdenASC) {
+			listadoTMP.reverse();
+		}
+		
+		return listadoTMP.slice(comienzo, final);
 	}
 	/*** Fin sistema de paginado */
 
@@ -179,7 +286,6 @@ export class HomeComponent implements OnInit {
 	}
 
 	getLiteralPerfil(numero) {
-		console.log(`Solicitado perfil ${numero}`);
 		let respuesta = "";
 		this.perfiles.forEach((element) => {
 			if (element.id === numero) {
@@ -187,7 +293,6 @@ export class HomeComponent implements OnInit {
 			}
 		});
 
-		console.log(`Encontrado perfil ${respuesta}`);
 		return respuesta;
 	}
 
@@ -229,9 +334,11 @@ export class HomeComponent implements OnInit {
 		return respuesta;
 	}
 
+	/**
+	 * Función que añade nuevas personas a la lista. 
+	 * @param numero 
+	 */
 	addPersons(numero: number = 10) {
-		console.log(`Añadiendo ${numero} personas mas`);
-
 		for (let i = 0; i < numero; i++) {
 			let temp: Persona = { nombre: "", apellidos: "", ID: "", fecha_antiguedad: "", perfil: 1, DNI: "", sexo: null, fecha_nacimiento: "", calle: "", numero: "", piso: "" };
 			temp.perfil = this.getRandPerfil();
@@ -247,13 +354,13 @@ export class HomeComponent implements OnInit {
 			temp.numero = this.getRandInt(190).toString() + (this.getRandInt(100) < 15 ? " Bis" : "");
 			temp.piso = this.getRandInt(9).toString() + " " + this.getRandomPuerta();
 
+			//Añadimos el registro a la lista general.
 			this.listadoGeneral.push(temp);
 		}
 	}
 
-	cierraInfoPersona()
-	{
-		this.personaSeleccionada=null;
+	cierraInfoPersona() {
+		this.personaSeleccionada = null;
 	}
 
 	estado = true;
@@ -759,11 +866,11 @@ export class HomeComponent implements OnInit {
 	 *
 	 */
 
-	personasMinimasXTurnos = {
-		M: 10,
-		T: 10,
-		N: 5,
-	};
+	// personasMinimasXTurnos = {
+	// 	M: 10,
+	// 	T: 10,
+	// 	N: 5,
+	// };
 
 	months: any[] = [
 		{ id: 1, name: "Enero" },
@@ -781,7 +888,6 @@ export class HomeComponent implements OnInit {
 	];
 
 	getLiteralMonth(numero) {
-		console.log(`Solicitado perfil ${numero}`);
 		let respuesta = "";
 		this.months.forEach((element) => {
 			if (element.id === numero) {
@@ -789,75 +895,393 @@ export class HomeComponent implements OnInit {
 			}
 		});
 
-		console.log(`mes ${respuesta}`);
 		return respuesta;
 	}
 
 	selectedMonth = 1;
 	selectedYear = 2023;
+	cuadranteMes: Mes = null;
 
-	cuadranteMes = null;
-
-
-	delays: any[] = [
-		{ perfil: 1, dias:4, descansos: 3 },
-		{ perfil: 2, dias:4, descansos: 3 },
-		{ perfil: 3, dias:2, descansos: 2 },
-		{ perfil: 4, dias:7, descansos: 7 },
-		{ perfil: 5, dias:10, descansos: 10 },
-	];
-
-	setDelay(perfil:number, dias:number, descansos:number)
-	{
-		this.delays.forEach(element => {
-			if(element.perfil === perfil)
-			{
-				element.dias = dias;
-				element.descansos = descansos;
-			}
-		});
-	}
-
-	getDelay(perfil)
-	{
-		let respuesta = null;
-
-		this.delays.forEach(element => {
-			if(element.perfil === perfil)
-			{
-			respuesta = element;
-			}
-		});
-
-		return respuesta;
-	}
-	
 	crearCuadranteMes() {
-		console.log(`Solicitado cuadrante del mes ${this.selectedMonth} de ${this.selectedYear}`);
-		this.cuadranteMes = this.generarListadoDiasXMes(this.selectedMonth, this.selectedYear);
+		this.cuadranteMes = {
+			numeroMes: this.selectedMonth,
+			dias: this.generarListadoDiasXMes(this.selectedMonth, this.selectedYear)
+		};
 	}
 
-	rellenarCuadranteMes()
-	{
-		console.log("Solicitado rellenado de cuadrante")
+
+	realizandoCalculos = false;
+
+	iniciaProcesoCuadrante() {
+		this.realizandoCalculos = true;
+		setTimeout(() => {
+			// De esta manera conseguimos que muestre el gif 
+			// animado de carga de datos
+			this.rellenarCuadranteMes();
+		}, 50);
+	}
+
+	porcentaje = 0;
+	/**
+	 * Para cada persona vamos a decirle que genere su cuadrante.
+	 */
+	rellenarCuadranteMes() {
+		this.porcentaje = 0;
+		let pos = 0;
+		let max = this.listadoGeneral.length;
+
+		this.listadoGeneral.forEach(async persona => {
+			this.porcentaje = Math.floor(pos * 100 / max);
+			this.generarCuadrantePersona(persona);
+		});
+		this.realizandoCalculos = false;
 	}
 
 	listadoFechas = null;
 
-	generarListadoDiasXMes(mes: number, anio: number): Array<{ dia: number; diaSemana: string; personas: string[] }> {
+	generarListadoDiasXMes(mes: number, anio: number): Array<Dia> {
 		const fecha = new Date(anio, mes - 1);
 		const ultimoDia = new Date(anio, mes, 0).getDate();
-		const dias = [];
-		for (let dia = 1; dia <= ultimoDia; dia++) {
-			fecha.setDate(dia);
-			const diaSemana = fecha.toLocaleString("default", { weekday: "long" });
-			dias.push({ dia, diaSemana, personas: [] }); // es lo mismo que (dia:dia, diaSemana:diaSemana , personas:[])
+		const dias: Array<Dia> = [];
+		for (let numero = 1; numero <= ultimoDia; numero++) {
+			fecha.setDate(numero);
+			dias.push({
+				numero,
+				diaSemana: fecha.toLocaleString("default", { weekday: "long" }),
+				perfiles: JSON.parse(JSON.stringify(this.perfilesVacios))		//para que sea copia no referencia
+			}); // es lo mismo que (dia:dia, diaSemana:diaSemana , personas:[])
 		}
 		return dias;
 	}
 
 
 
+	/**
+	 * Rellena en cuadranteMes los datos del técnico en los turnos 
+	 * que corresponda atendiendo a la parametrización
+	 * @param pSel 
+	 */
+	generarCuadrantePersona(pSel: Persona) {
 
+		//Hay que tener en cuenta que una persona de un perfil determinado 
+		//respete los días de trabajo seguidos y los descansos
+		let contadorDiasTrabajo = 0;
+		let contadorDiasDescanso = 0;
+		let ultimoDia = 0;
+		let busquedaTrabajo = true;
+		let ultimoTurno = '';
+
+
+		this.cuadranteMes.dias.forEach(dia => {
+			dia.perfiles.forEach(perfil => {
+				if (perfil.cod == pSel.perfil)	//estamos en el perfil correcto
+				{
+					//Buscamos trabajo (true) o descanso (false))?
+					if (busquedaTrabajo) {
+						if (contadorDiasTrabajo < perfil.dias_trabajo) {
+							//Antes de mirar el lugar más optimo, hay que saber si ya se le ha asignado un turno ese día
+							//Buscamos el turno con menos porcentaje de gente para este perfil
+							if (!this.estoyAsignadoDia(JSON.parse(JSON.stringify(pSel)), JSON.parse(JSON.stringify(dia)))) {
+								const optimo = this.buscaTurnoOptimo(perfil.turnos, ultimoTurno);
+								let turnoAsignado = false;
+								if (optimo != "") {	//Si se ha encontrado turno para ese día....
+									perfil.turnos.forEach(turno => {
+										if (turno.cod == optimo) {
+											ultimoTurno = optimo;
+											turnoAsignado = true;
+											turno.personas.push(pSel);
+											contadorDiasTrabajo++;
+											if (contadorDiasTrabajo >= perfil.dias_trabajo) {
+												busquedaTrabajo = false;
+												contadorDiasTrabajo = 0;
+											}
+										}
+									});
+								}
+								else {
+									// En este caso que hacemos?
+									// Si no hay hueco para ir a trabajar hay que dar salto en vacaciones o 
+									// Se añade al cuadrante y se indica el exceso de gente?
+									console.log("VACIO");
+
+								}
+								//Si los turnos estaban completos... y no se asigna turno, el numero de días trabajados se pone a 0
+								if (!turnoAsignado) { contadorDiasTrabajo = 0; }
+							}
+						}
+					}
+					else {
+						//Estamos buscando descanso
+						contadorDiasDescanso++;
+						if (contadorDiasDescanso >= perfil.dias_descansos) {
+							contadorDiasDescanso = 0;
+							busquedaTrabajo = true;
+						}
+					}
+				}
+			});
+		});
+	}
+
+	/**
+	 * Revisa si estoy asignado ya en algún turno del día dado.
+	 * @param yo 
+	 * @param dia 
+	 */
+	estoyAsignadoDia(yo: Persona, dia: Dia) {
+		let encontrado = false;
+		this.cuadranteMes.dias.forEach(item => {
+			if (item.numero == dia.numero) {
+				item.perfiles.forEach(element => {
+					if (element.cod == yo.perfil) {
+						element.turnos.forEach(turno => {
+							turno.personas.forEach(tipo => {
+								if (tipo.ID == yo.ID) {
+									encontrado = true;
+									return encontrado;
+								}
+							});
+						});
+					}
+				});
+			}
+		});
+		return encontrado;
+	}
+
+	/**
+	 * En función de los turnos de este perfil, miramos cual no está completo y en ese caso, 
+	 * cual está menos saturado
+	 * @param turnos 
+	 * @returns Devuelve el codigo del turno o la cadena vacía si están completos todos los 
+	 * turnos
+	 */
+	buscaTurnoOptimo(turnos: Turno[], ultimoTurno): string {
+		let respuesta = "";	//en caso de que todos los turnos estén completos.
+		let porcentaje = 100;
+		let p: Persona = null;
+		let proximo = false;	//para que coja los turnos en orden ciclico
+		turnos.forEach(turno => {
+			// No queremos que se repita el último turno asignado
+			// si el ultimo turno es vacio, podemos seleccionar el mejor
+			// de todos
+			// if (ultimoTurno!=turno.cod	
+			// 	&& turno.personas.length < turno.personas_minimas) {
+			// 	let tmpPorcentaje = (turno.personas.length * 100 / turno.personas_minimas);
+			// 	if (porcentaje > tmpPorcentaje) {
+			// 		respuesta = turno.cod;
+			// 		porcentaje = tmpPorcentaje;
+			// 		this.cdRef.markForCheck();
+			// 	}
+			// }
+			if (ultimoTurno == "N") {
+				console.log("PARAR AQUI")
+			}
+			//Si no hay ultimo turno, el más optimo de todos los que haya
+			if (ultimoTurno == "") {
+				if (turno.personas.length < turno.personas_minimas) {
+					let tmpPorcentaje = (turno.personas.length * 100 / turno.personas_minimas);
+					// console.log(`Turno ${turno.cod} -> ${tmpPorcentaje} de personas`)
+					if (porcentaje > tmpPorcentaje) {
+						respuesta = turno.cod;
+						porcentaje = tmpPorcentaje;
+					}
+				}
+			}
+			else {
+				if (ultimoTurno == turno.cod) {
+					proximo = true;
+				}
+				else {
+					if (proximo && turno.personas.length < turno.personas_minimas) {
+						proximo = false;
+						let tmpPorcentaje = (turno.personas.length * 100 / turno.personas_minimas);
+						if (porcentaje > tmpPorcentaje) {
+							respuesta = turno.cod;
+							porcentaje = tmpPorcentaje;
+						}
+					}
+				}
+			}
+
+
+		});
+
+		// Si llegamos aqui y proximo es true, es que estábamos en el ultimo turno, 
+		// y lo que le corresponde es el primero
+		if (proximo) {
+			for (let i = 0; i < turnos.length - 1; i++) {
+				let tmpPorcentaje = (turnos[i].personas.length * 100 / turnos[i].personas_minimas);
+				if (porcentaje > tmpPorcentaje) {
+					respuesta = turnos[i].cod;
+					porcentaje = tmpPorcentaje;
+				}
+			}
+		}
+
+		return respuesta
+	}
+
+	/**
+	 * Genera el listado de los IDs de las personas facilitadas
+	 * @param personas 
+	 * @returns 
+	 */
+	listadoPersonas(personas: Array<Persona>) {
+		let respuesta = "";
+
+		personas.forEach(tipo => {
+			respuesta += " - " + tipo.ID
+		});
+
+		return respuesta;
+	}
+
+	/**
+	 * Configuración de perfiles para el calculo de los cuadrantes
+	 */
+	perfilesVacios = [
+		{
+			cod: 1,
+			nombre: "Operador demanda",
+			dias_trabajo: 3,
+			dias_descansos: 2,
+			procesable: true,
+			turnos: [
+				{
+					cod: "M",
+					hora_ini: "08:00",
+					hora_fin: "15:00",
+					horas: 7,
+					personas_minimas: 5,
+					personas: []
+				},
+				{
+					cod: "T",
+					hora_ini: "15:00",
+					hora_fin: "22:00",
+					horas: 7,
+					personas_minimas: 5,
+					personas: []
+				},
+				{
+					cod: "N",
+					hora_ini: "22:00",
+					hora_fin: "08:00",
+					horas: 10,
+					personas_minimas: 7,
+					personas: []
+				}
+			]
+		},
+		{
+			cod: 2,
+			nombre: "Operador respuesta",
+			dias_trabajo: 3,
+			dias_descansos: 2,
+			procesable: true,
+			turnos: [
+				{
+					cod: "M",
+					hora_ini: "08:00",
+					hora_fin: "15:00",
+					horas: 7,
+					personas_minimas: 5,
+					personas: []
+				},
+				{
+					cod: "T",
+					hora_ini: "15:00",
+					hora_fin: "22:00",
+					horas: 7,
+					personas_minimas: 5,
+					personas: []
+				},
+				{
+					cod: "N",
+					hora_ini: "22:00",
+					hora_fin: "08:00",
+					horas: 10,
+					personas_minimas: 6,
+					personas: []
+				}
+			]
+		},
+		{
+			cod: 3,
+			nombre: "GPEX",
+			dias_trabajo: 3,
+			dias_descansos: 3,
+			procesable: false,
+			turnos: [
+				{
+					cod: "M",
+					hora_ini: "08:00",
+					hora_fin: "15:00",
+					horas: 7,
+					personas_minimas: 3,
+					personas: []
+				},
+				{
+					cod: "T",
+					hora_ini: "15:00",
+					hora_fin: "22:00",
+					horas: 7,
+					personas_minimas: 3,
+					personas: []
+				},
+				{
+					cod: "N",
+					hora_ini: "22:00",
+					hora_fin: "08:00",
+					horas: 10,
+					personas_minimas: 3,
+					personas: []
+				}
+			]
+		},
+		{
+			cod: 4,
+			nombre: "Jefe de Sala",
+			dias_trabajo: 1,
+			dias_descansos: 2,
+			procesable: false,
+			turnos: [
+				{
+					cod: "A",
+					hora_ini: "08:00",
+					hora_fin: "20:00",
+					horas: 12,
+					personas_minimas: 2,
+					personas: []
+				},
+				{
+					cod: "P",
+					hora_ini: "20:00",
+					hora_fin: "08:00",
+					horas: 12,
+					personas_minimas: 2,
+					personas: []
+				}
+			]
+		},
+		{
+			cod: 5,
+			nombre: "J2",
+			dias_trabajo: 2,
+			dias_descansos: 4,
+			procesable: false,
+			turnos: [
+				{
+					cod: "D",
+					hora_ini: "08:00",
+					hora_fin: "08:00",
+					horas: 24,
+					personas_minimas: 1,
+					personas: []
+				}
+			]
+		}
+	]
 
 }
