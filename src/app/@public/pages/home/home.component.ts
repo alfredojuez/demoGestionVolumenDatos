@@ -29,6 +29,8 @@ interface Turno {
 interface Perfil {
 	cod: number;
 	nombre: string;
+	dias_trabajo: number,
+	dias_descansos: number,
 	turnos: Array<Turno>;
 }
 
@@ -252,9 +254,11 @@ export class HomeComponent implements OnInit {
 		return respuesta;
 	}
 
+	/**
+	 * Función que añade nuevas personas a la lista. 
+	 * @param numero 
+	 */
 	addPersons(numero: number = 10) {
-		console.log(`Añadiendo ${numero} personas mas`);
-
 		for (let i = 0; i < numero; i++) {
 			let temp: Persona = { nombre: "", apellidos: "", ID: "", fecha_antiguedad: "", perfil: 1, DNI: "", sexo: null, fecha_nacimiento: "", calle: "", numero: "", piso: "" };
 			temp.perfil = this.getRandPerfil();
@@ -270,6 +274,7 @@ export class HomeComponent implements OnInit {
 			temp.numero = this.getRandInt(190).toString() + (this.getRandInt(100) < 15 ? " Bis" : "");
 			temp.piso = this.getRandInt(9).toString() + " " + this.getRandomPuerta();
 
+			//Añadimos el registro a la lista general.
 			this.listadoGeneral.push(temp);
 		}
 	}
@@ -819,43 +824,26 @@ export class HomeComponent implements OnInit {
 	cuadranteMes: Mes = null;
 
 
-	delays: any[] = [
-		{ perfil: 1, dias: 4, descansos: 3 },
-		{ perfil: 2, dias: 4, descansos: 3 },
-		{ perfil: 3, dias: 2, descansos: 2 },
-		{ perfil: 4, dias: 7, descansos: 7 },
-		{ perfil: 5, dias: 10, descansos: 10 },
-	];
-
-	setDelay(perfil: number, dias: number, descansos: number) {
-		this.delays.forEach(element => {
-			if (element.perfil === perfil) {
-				element.dias = dias;
-				element.descansos = descansos;
-			}
-		});
-	}
-
-	getDelay(perfil) {
-		let respuesta = null;
-
-		this.delays.forEach(element => {
-			if (element.perfil === perfil) {
-				respuesta = element;
-			}
-		});
-
-		return respuesta;
-	}
-
 	crearCuadranteMes() {
-		console.log(`Solicitado cuadrante del mes ${this.selectedMonth} de ${this.selectedYear}`);
 		this.cuadranteMes = {
 			numeroMes: this.selectedMonth,
 			dias: this.generarListadoDiasXMes(this.selectedMonth, this.selectedYear)
 		};
 	}
 
+
+
+
+	realizandoCalculos = false;
+
+	iniciaProcesoCuadrante() {
+		this.realizandoCalculos = true;
+		setTimeout(() => {
+			// De esta manera conseguimos que muestre el gif 
+			// animado de carga de datos
+			this.rellenarCuadranteMes();
+		}, 50);
+	}
 
 	porcentaje = 0;
 	/**
@@ -866,13 +854,11 @@ export class HomeComponent implements OnInit {
 		let pos = 0;
 		let max = this.listadoGeneral.length;
 
-		console.log("Solicitado rellenado de cuadrante")
-		this.listadoGeneral.forEach(persona => {
-			pos++;
+		this.listadoGeneral.forEach(async persona => {
 			this.porcentaje = Math.floor(pos * 100 / max);
-
 			this.generarCuadrantePersona(persona);
 		});
+		this.realizandoCalculos = false;
 	}
 
 	listadoFechas = null;
@@ -894,162 +880,58 @@ export class HomeComponent implements OnInit {
 
 
 
-
-	perfilesVacios = [
-		{
-			cod: 1,
-			nombre: "Operador demanda",
-			turnos: [
-				{
-					cod: "M",
-					hora_ini: "08:00",
-					hora_fin: "15:00",
-					horas: 7,
-					personas_minimas: 5,
-					personas: []
-				},
-				{
-					cod: "T",
-					hora_ini: "15:00",
-					hora_fin: "22:00",
-					horas: 7,
-					personas_minimas: 5,
-					personas: []
-				},
-				{
-					cod: "N",
-					hora_ini: "22:00",
-					hora_fin: "08:00",
-					horas: 10,
-					personas_minimas: 7,
-					personas: []
-				}
-			]
-		},
-		{
-			cod: 2,
-			nombre: "Operador respuesta",
-			turnos: [
-				{
-					cod: "M",
-					hora_ini: "08:00",
-					hora_fin: "15:00",
-					horas: 7,
-					personas_minimas: 5,
-					personas: []
-				},
-				{
-					cod: "T",
-					hora_ini: "15:00",
-					hora_fin: "22:00",
-					horas: 7,
-					personas_minimas: 5,
-					personas: []
-				},
-				{
-					cod: "N",
-					hora_ini: "22:00",
-					hora_fin: "08:00",
-					horas: 10,
-					personas_minimas: 6,
-					personas: []
-				}
-			]
-		},
-		{
-			cod: 3,
-			nombre: "GPEX",
-			turnos: [
-				{
-					cod: "M",
-					hora_ini: "08:00",
-					hora_fin: "15:00",
-					horas: 7,
-					personas_minimas: 3,
-					personas: []
-				},
-				{
-					cod: "T",
-					hora_ini: "15:00",
-					hora_fin: "22:00",
-					horas: 7,
-					personas_minimas: 3,
-					personas: []
-				},
-				{
-					cod: "N",
-					hora_ini: "22:00",
-					hora_fin: "08:00",
-					horas: 10,
-					personas_minimas: 3,
-					personas: []
-				}
-			]
-		},
-		{
-			cod: 4,
-			nombre: "Jefe de Sala",
-			turnos: [
-				{
-					cod: "A",
-					hora_ini: "08:00",
-					hora_fin: "20:00",
-					horas: 12,
-					personas_minimas: 2,
-					personas: []
-				},
-				{
-					cod: "P",
-					hora_ini: "20:00",
-					hora_fin: "08:00",
-					horas: 12,
-					personas_minimas: 2,
-					personas: []
-				}
-			]
-		},
-		{
-			cod: 5,
-			nombre: "J2",
-			turnos: [
-				{
-					cod: "D",
-					hora_ini: "08:00",
-					hora_fin: "08:00",
-					horas: 24,
-					personas_minimas: 1,
-					personas: []
-				}
-			]
-		}
-	]
-
-
 	/**
 	 * Rellena en cuadranteMes los datos del técnico en los turnos 
 	 * que corresponda atendiendo a la parametrización
 	 * @param pSel 
 	 */
 	generarCuadrantePersona(pSel: Persona) {
+
+		//Hay que tener en cuenta que una persona de un perfil determinado 
+		//respete los días de trabajo seguidos y los descansos
+		let contadorDiasTrabajo = 0;
+		let contadorDiasDescanso = 0;
+		let ultimoDia = 0;
+		let busquedaTrabajo = true;
+		let ultimoTurno = '';
+
+
 		this.cuadranteMes.dias.forEach(dia => {
 			dia.perfiles.forEach(perfil => {
 				if (perfil.cod == pSel.perfil)	//estamos en el perfil correcto
 				{
-					//Antes de mirar el lugar más optimo, hay que saber si ya se le ha asignado un turno ese día
-					console.log(`Comporbamos si ${pSel.ID} está asignado ya al día ${dia.numero}`)
-					let asignado = this.estoyAsignadoDia(JSON.parse(JSON.stringify(pSel)), JSON.parse(JSON.stringify(dia)));
-					console.log(asignado);
-
-					//Buscamos el turno con menos porcentaje de gente para este perfil
-					if (!asignado) {
-						const optimo = this.buscaTurnoOptimo(perfil.turnos);
-
-						perfil.turnos.forEach(t => {
-							if (t.cod == optimo) {
-								t.personas.push(pSel);
-								console.log(`Añadimos persona ${pSel.ID}`)
+					//Buscamos trabajo (true) o descanso (false))?
+					if (busquedaTrabajo) {
+						if (contadorDiasTrabajo < perfil.dias_trabajo) {
+							//Antes de mirar el lugar más optimo, hay que saber si ya se le ha asignado un turno ese día
+							//Buscamos el turno con menos porcentaje de gente para este perfil
+							if (!this.estoyAsignadoDia(JSON.parse(JSON.stringify(pSel)), JSON.parse(JSON.stringify(dia)))) {
+								const optimo = this.buscaTurnoOptimo(perfil.turnos, ultimoTurno);
+								let turnoAsignado = false;
+								perfil.turnos.forEach(turno => {
+									if (turno.cod == optimo) {
+										ultimoTurno = optimo;
+										turnoAsignado = true;
+										turno.personas.push(pSel);
+										contadorDiasTrabajo++;
+										if (contadorDiasTrabajo >= perfil.dias_trabajo) {
+											busquedaTrabajo = false;
+											contadorDiasTrabajo = 0;
+										}
+									}
+								});
+								//Si los turnos estaban completos... y no se asigna turno, el numero de días trabajados se pone a 0
+								if (!turnoAsignado) { contadorDiasTrabajo = 0; }
 							}
-						});
+						}
+					}
+					else {
+						//Estamos buscando descanso
+						contadorDiasDescanso++;
+						if (contadorDiasDescanso >= perfil.dias_descansos) {
+							contadorDiasDescanso = 0;
+							busquedaTrabajo = true;
+						}
 					}
 				}
 			});
@@ -1089,24 +971,220 @@ export class HomeComponent implements OnInit {
 	 * @returns Devuelve el codigo del turno o la cadena vacía si están completos todos los 
 	 * turnos
 	 */
-	buscaTurnoOptimo(turnos: Turno[]): string {
-		console.log(turnos);
-
+	buscaTurnoOptimo(turnos: Turno[], ultimoTurno): string {
 		let respuesta = "";	//en caso de que todos los turnos estén completos.
 		let porcentaje = 100;
-
 		let p: Persona = null;
+		let proximo = false;	//para que coja los turnos en orden ciclico
 		turnos.forEach(turno => {
-			if (turno.personas.length < turno.personas_minimas) {
-				let tmpPorcentaje = (turno.personas.length * 100 / turno.personas_minimas);
-				if (porcentaje > tmpPorcentaje) {
-					respuesta = turno.cod;
-					porcentaje = tmpPorcentaje;
+			// No queremos que se repita el último turno asignado
+			// si el ultimo turno es vacio, podemos seleccionar el mejor
+			// de todos
+			// if (ultimoTurno!=turno.cod	
+			// 	&& turno.personas.length < turno.personas_minimas) {
+			// 	let tmpPorcentaje = (turno.personas.length * 100 / turno.personas_minimas);
+			// 	if (porcentaje > tmpPorcentaje) {
+			// 		respuesta = turno.cod;
+			// 		porcentaje = tmpPorcentaje;
+			// 		this.cdRef.markForCheck();
+			// 	}
+			// }
+
+			//Si no hay ultimo turno, el más optimo de todos los que haya
+			if(ultimoTurno=="")
+			{	
+				if (turno.personas.length < turno.personas_minimas) {
+					let tmpPorcentaje = (turno.personas.length * 100 / turno.personas_minimas);
+					console.log(`Turno ${turno.cod} -> ${tmpPorcentaje} de personas`)
+					if (porcentaje > tmpPorcentaje) {
+						respuesta = turno.cod;
+						porcentaje = tmpPorcentaje;
+					}
 				}
 			}
+			else
+			{
+				if (ultimoTurno == turno.cod) {
+					proximo = true;
+				}
+				else {
+					if (proximo && turno.personas.length < turno.personas_minimas) {
+						proximo = false;
+						let tmpPorcentaje = (turno.personas.length * 100 / turno.personas_minimas);
+						if (porcentaje > tmpPorcentaje) {
+							respuesta = turno.cod;
+							porcentaje = tmpPorcentaje;
+						}
+					}
+				}
+			}
+
+
 		});
 
+		//si llegamos aqui y proximo es true, es que estábamos en el ultimo turno, y lo que le corresponde es el primero
+		if(proximo)
+		{
+			respuesta = turnos[0].cod;
+		}
 		return respuesta
 	}
+
+	/**
+	 * Genera el listado de los IDs de las personas facilitadas
+	 * @param personas 
+	 * @returns 
+	 */
+	listadoPersonas(personas: Array<Persona>) {
+		let respuesta = "";
+
+		personas.forEach(tipo => {
+			respuesta += " - " + tipo.ID
+		});
+
+		return respuesta;
+	}
+
+	/**
+	 * Configuración de perfiles para el calculo de los cuadrantes
+	 */
+	perfilesVacios = [
+		{
+			cod: 1,
+			nombre: "Operador demanda",
+			dias_trabajo: 3,
+			dias_descansos: 2,
+			turnos: [
+				{
+					cod: "M",
+					hora_ini: "08:00",
+					hora_fin: "15:00",
+					horas: 7,
+					personas_minimas: 5,
+					personas: []
+				},
+				{
+					cod: "T",
+					hora_ini: "15:00",
+					hora_fin: "22:00",
+					horas: 7,
+					personas_minimas: 5,
+					personas: []
+				},
+				{
+					cod: "N",
+					hora_ini: "22:00",
+					hora_fin: "08:00",
+					horas: 10,
+					personas_minimas: 7,
+					personas: []
+				}
+			]
+		},
+		{
+			cod: 2,
+			nombre: "Operador respuesta",
+			dias_trabajo: 3,
+			dias_descansos: 2,
+			turnos: [
+				{
+					cod: "M",
+					hora_ini: "08:00",
+					hora_fin: "15:00",
+					horas: 7,
+					personas_minimas: 5,
+					personas: []
+				},
+				{
+					cod: "T",
+					hora_ini: "15:00",
+					hora_fin: "22:00",
+					horas: 7,
+					personas_minimas: 5,
+					personas: []
+				},
+				{
+					cod: "N",
+					hora_ini: "22:00",
+					hora_fin: "08:00",
+					horas: 10,
+					personas_minimas: 6,
+					personas: []
+				}
+			]
+		},
+		{
+			cod: 3,
+			nombre: "GPEX",
+			dias_trabajo: 3,
+			dias_descansos: 3,
+			turnos: [
+				{
+					cod: "M",
+					hora_ini: "08:00",
+					hora_fin: "15:00",
+					horas: 7,
+					personas_minimas: 3,
+					personas: []
+				},
+				{
+					cod: "T",
+					hora_ini: "15:00",
+					hora_fin: "22:00",
+					horas: 7,
+					personas_minimas: 3,
+					personas: []
+				},
+				{
+					cod: "N",
+					hora_ini: "22:00",
+					hora_fin: "08:00",
+					horas: 10,
+					personas_minimas: 3,
+					personas: []
+				}
+			]
+		},
+		{
+			cod: 4,
+			nombre: "Jefe de Sala",
+			dias_trabajo: 1,
+			dias_descansos: 2,
+			turnos: [
+				{
+					cod: "A",
+					hora_ini: "08:00",
+					hora_fin: "20:00",
+					horas: 12,
+					personas_minimas: 2,
+					personas: []
+				},
+				{
+					cod: "P",
+					hora_ini: "20:00",
+					hora_fin: "08:00",
+					horas: 12,
+					personas_minimas: 2,
+					personas: []
+				}
+			]
+		},
+		{
+			cod: 5,
+			nombre: "J2",
+			dias_trabajo: 2,
+			dias_descansos: 4,
+			turnos: [
+				{
+					cod: "D",
+					hora_ini: "08:00",
+					hora_fin: "08:00",
+					horas: 24,
+					personas_minimas: 1,
+					personas: []
+				}
+			]
+		}
+	]
 
 }
